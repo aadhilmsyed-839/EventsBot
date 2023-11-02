@@ -107,7 +107,7 @@ async def get_metar_info(icao_code : str):
     """
     
     # API URL for METAR info
-    api_url = f"https://beta.aviationweather.gov/cgi-bin/data/metar.php?ids={icao_code}&format=json"
+    api_url = f"https://aviationweather.gov/cgi-bin/data/metar.php?ids={icao_code}&format=json"
     
     try:
         # Send a GET request to the API
