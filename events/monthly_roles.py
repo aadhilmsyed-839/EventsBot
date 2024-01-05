@@ -3,8 +3,8 @@ import discord
 from discord.ext import commands
 
 # Import Bot & Logger Objects
-from bot.init import bot
-from bot.logger.init import logger
+from bot import bot
+from logger import logInfo
 
 # Import from Local Files
 from config import flight_hours, roles
@@ -28,37 +28,30 @@ async def assign_roles(ctx, member : discord.Member):
     Returns:
         None
     """
-    try:
-        # Declare Global Variables
-        global flight_hours
-        global roles
-        
-        # If the Member is not a bot, assign the 'Member' role; else assign 'Bot'
-        if not member.bot: await member.add_roles(discord.utils.get(member.guild.roles, id = 844635858501500988)) # TODO: Change to GE Member Role
-        else:              await member.add_roles(discord.utils.get(member.guild.roles, id = 553935416496226305)) # TODO: Change to GE Member Role
-        
-        # Remove roles from previous role update
-        for role_id in list(roles.keys()):
-            await member.remove_roles(discord.utils.get(member.guild.roles, id = role_id))
-        
-        # Return if the member has not logged any flight hours
-        if member.name not in list(flight_hours.keys()): return
-        
-        # Get the number of Minutes from the Flight Time
-        hours = flight_hours[member.name].total_seconds() // 3600
-        
-        # Assign them Roles Based on their Threshold
-        for role_id, threshold in roles.items():
-        
-            # If the Hours Meets the Threshold, Assign the Role
-            if hours >= threshold:
-                role = discord.utils.get(member.guild.roles, id = role_id)
-                await member.add_roles(discord.utils.get(member.guild.roles, id = role_id))
-                logger.info(f"{member.name} was assigned {role} during role updates.")
-#                await ctx.send(f"{member.name} was assigned {role}.")
-                break      # Prevents Multiple Role Assignments
+    # Declare Global Variables
+    global flight_hours
+    global roles
+    
+    # Remove roles from previous role update
+    for role_id in list(roles.keys()):
+        await member.remove_roles(discord.utils.get(member.guild.roles, id = role_id))
+    
+    # Return if the member has not logged any flight hours
+    if member.id not in list(flight_hours.keys()): return
+    
+    # Get the number of Minutes from the Flight Time
+    hours = flight_hours[member.name] // 60
+    
+    # Assign them Roles Based on their Threshold
+    for role_id, threshold in roles.items():
+    
+        # If the Hours Meets the Threshold, Assign the Role
+        if hours >= threshold:
+            role = discord.utils.get(member.guild.roles, id = role_id)
+            await member.add_roles(discord.utils.get(member.guild.roles, id = role_id))
+            logInfo(f"{member} was assigned {role} during role updates.")
+            break      # Prevents Multiple Role Assignments
                 
-    except Exception as e: logger.error(e)
 
 
 # Command to update roles based on flight hours
@@ -78,21 +71,21 @@ async def update_roles(ctx):
     """
     
     # Update Logger Information
-    logger.info(f"Server Role Updates requested by {ctx.message.author}.")
-    logger.info("Starting Role Updates...")
+    logInfo(f"Server Role Updates requested by {ctx.message.author}.")
+    logInfo("Starting Role Updates...")
     
     try:
         # For all members in the server, assign their new role
         for member in ctx.guild.members: await assign_roles(ctx, member)
         
-        # Update Information to Channel and Logger
-        await ctx.send("All Roles have been updated based on flight hours.")
-        logger.info("Role Updates Complete.")
+        # Update Information to Logger
+        logInfo("Role Updates Complete.")
         
         # Clear the Flight Logs for the Next Month
-        await clear_flight_logs(ctx)
+        logInfo("Clearing Flight Hours...")
+        flight_hours.clear()
         
-    except Exception as e: logger.error(e)
+    except Exception as e: logInfo(e)
 
 @bot.command()
 @commands.has_permissions(manage_roles = True)
@@ -109,27 +102,15 @@ async def clear_flight_logs(ctx):
         None
     """
     
-    try:
-        # Declare Global Variables
-        global flight_hours
-        
-        # Export the Flight Logs to a JSON File in case we need to reload
-#        filename = 'data/flight_logs.json'
-#        logger.info(f"Saving flight logs to {filename}...")
-#        save_flight_logs_to_file(filename)
-#        logger.info(f"Flight Logs saved to {filename}.")
-        
-        # Clear each entry in the flight logs
-        logger.info("Clearing Flight Logs...")
-        for member in list(flight_hours.keys()): del flight_hours[member]
-        logger.info("Flight Logs Reset.")
-        await ctx.send("Flight Logs Have Been Reset.")
-        
-        # Check the Length of the Flight Logs to ensure full reset
-        logger.info(f"flight_hours has a total of {len(flight_hours)} entries.")
+    # Declare Global Variables
+    global flight_hours
     
-    # Log any Errors
-    except Exception as e: logger.error(e)
+    # Clear the dictionary
+    flight_hours.clear()
+    
+    # Check the Length of the Flight Logs to ensure full reset
+    logInfo(f"flight_hours has a total of {len(flight_hours)} entries.")
+    
 
 
 #@bot.command()
@@ -148,13 +129,13 @@ async def clear_flight_logs(ctx):
 #    try:
 #
 #        # Print Logger Message
-#        logger.info(f"Exporting Flight Logs to {filename}...")
+#        logInfo(f"Exporting Flight Logs to {filename}...")
 #
 #        # Call the Helper Function to Save the Logs to a File
 #        save_flight_logs_to_file(filename)
 #
 #        # Print Logger Message
-#        logger.info("Exported Flight Logs Successfully.")
+#        logInfo("Exported Flight Logs Successfully.")
 #
 #    except Exception as e: logger.error(e)
 #
@@ -207,7 +188,7 @@ async def clear_flight_logs(ctx):
 #        global flight_hours
 #
 #        # Print Logger Message
-#        logger.info(f"Importing Flight Logs from {filename}...")
+#        logInfo(f"Importing Flight Logs from {filename}...")
 #
 #        # Open the JSON File and Read the Data from it
 #        with open(filename, 'r') as json_file:
@@ -215,7 +196,7 @@ async def clear_flight_logs(ctx):
 #            flight_hours = data.get("flight_hours", {})
 #
 #        # Print Logger Message
-#        logger.info("Imported Flight Logs Successfully.")
+#        logInfo("Imported Flight Logs Successfully.")
 #
 #    except Exception as e: logger.error(e)
 #
@@ -236,11 +217,11 @@ async def clear_flight_logs(ctx):
 #    try:
 #
 #        # Get the JSON Flight Logs File
-#        logger.info(f"Retrieving Flight Logs from {filename}...")
+#        logInfo(f"Retrieving Flight Logs from {filename}...")
 #        json_file = save_flight_logs_to_file(filename)
 #        data = json.load(json_file)
 #        flight_hours = data.get("flight_hours", {})
-#        logger.info(f"Retrieving Flight Logs from {filename}.")
+#        logInfo(f"Retrieving Flight Logs from {filename}.")
 #
 #        # 2. Convert JSON Data to a List of Dictionaries
 #        data_list = [{'member_name': key, 'flight_hours': value} for key, value in flight_hours.items()]
@@ -261,7 +242,7 @@ async def clear_flight_logs(ctx):
 #            # Write the data rows
 #            csv_writer.writerows(data_list)
 #
-#        logger.info(f'Conversion from JSON to CSV completed. CSV file saved as {csv_file_path}')
+#        logInfo(f'Conversion from JSON to CSV completed. CSV file saved as {csv_file_path}')
 #
 #        # Send the CSV file as an attachment to the channel
 #        with open(csv_file_path, 'rb') as file:

@@ -4,8 +4,8 @@ from discord.enums import EventStatus
 from discord.ext import commands, tasks
 
 # Import Bot & Logger Objects
-from bot.init import bot
-from bot.logger.init import logger
+from bot import bot
+from logger import logInfo
 
 # Import Necessary Local Files
 from config import flight_hours, start_time
@@ -14,12 +14,6 @@ from config import voice_channel, is_event_active
 # Import Other Necessary Libraries
 from datetime import datetime as time
 import pytz
-
-# Declare Global Variables
-global is_event_active
-global voice_channel
-global flight_hours
-global start_time
 
 @bot.event
 async def on_voice_state_update(member, before, after):
@@ -37,33 +31,24 @@ async def on_voice_state_update(member, before, after):
     Returns:
         None
     """
-    try:
     
-        # Declare Global Variables
-        global is_event_active
-        global voice_channel
-        global flight_hours
-        global start_time
-
-        # Exit the Function if there is no Ongoing Event
-        if not is_event_active: return
-
-        # If the User has joined the vc, start their timer
-        if after.channel == voice_channel:
-            start_time[member.name] = time.now(pytz.utc)
-            logger.info(f"{member} Joined the Event. Starting Logging...")
-            
-        # If the User left the vc, then stop their timer and add it to flight logs
-        if before.channel == voice_channel:
+    # Declare Global Variables
+    global flight_hours, start_time, isEventActive, voiceChannel
+    
+    # If There is No Ongoing Event, then Ignore
+    if not isEventActive: return
+    
+    # If The User Joins the Event Voice Channel, Start Logging For Them
+    if after.channel == voiceChannel:
+        logInfo(f"{member} Joined the Event. Starting Logging...")
+        start_time[member.id] = time.now(pytz.utc)
         
-            # Check if the user was previously tracked
-            if member.name not in start_time: return
+    # If The User Leaves the Event Voice Channel, End Their Logging and Update their Flight Hours
+    elif before.channel == voiceChannel:
+        logInfo(f"{member} Left the Event. Ending Logging...")
+        log_left_member(member.id)
+        
             
-            # Log the Flight Hours of the Member who left VC
-            log_left_member(member.name)
-    
-    except Exception as e: logger.error(e)
-    
     
 @bot.event
 async def on_scheduled_event_update(before, after):
@@ -80,86 +65,44 @@ async def on_scheduled_event_update(before, after):
     Returns:
         None
     """
-    try:
+    
+    # Declare Global Variables
+    global flight_hours, start_time, isEventActive, voiceChannel
+    
+    # If the Status of the Event changes to Active, Start Logging for That Event
+    if after.status == EventStatus.active:
         
-        # Declare Global Variables
-        global is_event_active
-        global voice_channel
-        global flight_hours
-        global start_time
-
-        # Set Event Active Status to True if Event is Active
-        if after.status == EventStatus.active:
-            logger.info(f"Starting Flight Logging for Event '{after.name}'.")
-            is_event_active = True
-            voice_channel = after.channel
-            
-            # Log any Members who were already in vc
-            log_vc_members(after.channel)
-                
-        # Set Event Active Status to False if Event has Ended & Update Flight Hours
-        if after.status == EventStatus.ended:
-            logger.info(f"Ending Flight Logging for Event '{after.name}'.")
-            is_event_active = False
-            voice_channel = None
-            
-            # Update Flight Hours
-            update_flight_hours()
-            
-    except Exception as e: logger.error(e)
-    
-
-def log_vc_members(channel):
-    """
-    Description:
-        This helper function logs any members who may have already been in the vc prior
-        to the start of the event to avoid any edge cases.
-    
-    Arguments:
-        channel : The voice channel that the members are in
+        # Update Logger Information
+        logInfo(f"Starting Flight Logging for Event '{after.name}'.")
         
-    Returns:
-        None
-    """
-    try:
+        # Update the Event Voice Channel & Event Status Flag
+        voiceChannel, isEventActive = after.channel, True
         
-        # Declare Global Variables
-        global flight_hours
-        global start_time
-
-        # Start the Flight Logger For every member in the channel
-        for member in channel.members:
-            start_time[member.name] = time.now(pytz.utc)
-            logger.info(f"{member} Joined the Event. Starting Logging...")
-    
-    except Exception as e: logger.error(e)
+        # If Members Are Already in the Voice Channel, Log Them
+        for member in voiceChannel.members:
+            start_time[member.id] = time.now(pytz.utc)
+            logInfo(f"{member} Joined the Event. Starting Logging...")
     
     
-def update_flight_hours():
-    """
-    Description:
-        This helper function calculates and updates the flight hours of the remaining
-        members who joined the event in case the event ends before they leave.
-    
-    Arguments:
-        None
+    # If the Status of the Event Changes to Ended, End Logging for the Event
+    if after.status == EventStatus.ended:
         
-    Returns:
-        None
-    """
-    try:
-    
-        # Declare Global Variables
-        global flight_hours
-        global start_time
-    
-        # For every member who joined the event, log the flight time for that member
-        for member_name in list(start_time.keys()): log_left_member(member_name)
+        # End the Logging For All Members Who Joined the Event
+        for member_id in start_time.keys():
+            logInfo(f"{member} Left the Event. Ending Logging...")
+            log_left_member(member_id)
         
-    except Exception as e: logger.error(e)
+        # Update Logger Information
+        logInfo(f"Ending Flight Logging for Event '{before.name}'.")
+        
+        # Update the Event Voice Channel and Event Status Flag
+        voiceChannel, isEventActive = None, False
+        
+        # Clear Start Times
+        start_time.clear()
+        
 
-
-def log_left_member(member_name):
+async def log_left_member(member_id):
     """
     Descrption:
         This helper function logs any members who have left the voice channel or if an event
@@ -172,22 +115,20 @@ def log_left_member(member_name):
     Returns:
         None
     """
-    try:
     
-        # Calculate the Elapsed Time of the Member in VC
-        elapsed_time = time.now(pytz.utc) - start_time[member_name]
-        
-        # Add the Elapsed Time to the Member's Flight Hours
-        if member_name not in flight_hours: flight_hours[member_name] = elapsed_time
-        else: flight_hours[member_name] += elapsed_time
-        
-        # Update Logger Information
-        logger.info(f"{member_name} Left the Event. Logging Complete ({elapsed_time}).")
-        logger.info(f"{member_name} Total Flight Hours - {flight_hours[member_name]}.")
-        logger.info(f"flight_hours now has a total of {len(flight_hours)} members.")
-        
-        # Delete that member instance from start times
-        del start_time[member_name]
+    # Declare Global Variables
+    global flight_hours, start_time
+
+    # Calculate How Long the Member Has Been in the Voice Channel
+    elapsed = time.now(pytz.utc) - start_time[member_id]
     
-    # Log any Errors
-    except Exception as e: logger.error(e)
+    # If the Member is Not Already in the Flight Hours Dictionary, Add Them
+    if member_id not in flight_hours.keys(): flight_hours[member_id] = 0
+    
+    # Append their Elapsed Time to their Existing Flight Time
+    flight_hours[member_id] += (elapsed.total_seconds() // 60)
+    logInfo(f"{(elapsed.total_seconds() // 60)} minutes of flight time was added to <@{member_id}>")
+    logInfo(f"<@{member_id}> Has a Total Flight Time of {flight_hours[member_id]} Minutes.")
+    
+    # Remove The Member From the Start Time Dictionary
+    del start_time[member_id]
