@@ -1,7 +1,7 @@
 # Get the Token from the OS environment
-#import os
-#TOKEN = os.environ['DISCORD_TOKEN']
-from data.token import TOKEN
+import os
+TOKEN = os.environ['DISCORD_TOKEN']
+#from data.token import TOKEN
 
 # Import Discord Python Libraries
 import discord
@@ -23,5 +23,4 @@ from events.flight_logs import *
 from events.monthly_roles import *
 
 # Start the Bot
-#logger.info('Starting the bot...')
 bot.run(TOKEN)
