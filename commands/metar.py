@@ -4,7 +4,7 @@ from discord.ext import commands
 
 # Import Bot & Logger Objects
 from bot import bot
-from logger import logInfo
+from logger import logger
 
 # Import Other Necessary Libraries
 import aiohttp
@@ -13,11 +13,10 @@ import time
 import math
 
 # Import Necessary Local Files
-from config import metar_embed_thumbnail_url
-#from data.keys import unsplash_api_key
+from config import config
 
 @bot.command()
-async def metar(ctx, icao_code : str):
+async def metar(ctx, icao_code: str):
     """
     Command to fetch and display METAR information for a specified airport ICAO code.
 
@@ -28,61 +27,62 @@ async def metar(ctx, icao_code : str):
     Returns:
         None
     """
+    try:
+        # Perform Input Validation on the ICAO Airport Code
+        if not icao_code.isalnum() or not (len(icao_code) == 4):
+            await ctx.send("Invalid ICAO code format. It must 4 alphanumeric characters.")
+            return
+
+        # Get the METAR data from the API
+        metar_data = await get_metar_info(icao_code)
+
+        # Send Error Message and Exit Function if No Information was Retrieved
+        if metar_data is None:
+            await ctx.send(f"Unable to retrieve METAR info for {icao_code}")
+            return
+
+        # Create an embed
+        embed = discord.Embed(
+            title=f"METAR for {metar_data['icaoId']}",
+            description=f"{metar_data['name']}",
+            color=discord.Color.blue()
+        )
+
+        # Add Other Fields
+        embed.add_field(name="Latitude", value=f"{metar_data['lat']}")
+        embed.add_field(name="Longitude", value=f"{metar_data['lon']}")
+        embed.add_field(name="Altitude", value=f"{metar_data['elev']}")
+        embed.add_field(name="Temperature (°C)", value=f"{metar_data['temp']}°C")
+        embed.add_field(name="Dew Point (°C)", value=f"{metar_data['dewp']}°C")
+        embed.add_field(name="Wind Direction", value=f"{metar_data['wdir']}°")
+        embed.add_field(name="Wind Speed (KT)", value=f"{metar_data['wspd']} KT")
+        embed.add_field(name="Visibility", value=f"{metar_data['visib']}")
+        embed.add_field(name="Altimeter (mb)", value=f"{metar_data['altim']} mb")
+        embed.add_field(name="Sea Level Pressure (mb)", value=f"{metar_data['slp']} mb")
+        embed.add_field(name="Report Time", value=f"{metar_data['reportTime']}")
+
+        # Check if there are cloud cover data
+        if 'clouds' in metar_data:
+            clouds = metar_data['clouds']
+            cloud_info = "\n".join([f"{cloud['cover']} Clouds at {cloud['base']} feet" for cloud in clouds])
+            embed.add_field(name="Cloud Cover", value=cloud_info)
+
+        # Add raw METAR Info to Embed
+        embed.add_field(name="Raw METAR", value=f"{metar_data['rawOb']}")
+
+        # Add airport picture as the thumbnail
+        embed.set_thumbnail(url=config.metar_embed_thumbnail_url)
+
+        # Set Embed Footer
+        text = "Data Provided by Aviation Weather Center API."
+        embed.set_footer(text=text)
+
+        await ctx.send(embed=embed)
+
+    except Exception as e: await logger.error(f"An error occurred in metar command: {e}")
+
     
-    # Perform Input Validation on the ICAO Airport Code
-    if not icao_code.isalnum() or not (len(icao_code) == 4):
-        await ctx.send ("Invalid ICAO code format. It must 4 alphanumeric characters.")
-        return
-        
-    # Get the METAR data from the API
-    metar_data = await get_metar_info(icao_code)
-
-    # Send Error Message and Exit Function if No Information was Retrieved
-    if metar_data == None:
-        await ctx.send(f"Unable to retrieve METAR info for {icao_code}")
-        return
-
-    # Create an embed
-    embed = discord.Embed(
-        title       = f"METAR for {metar_data['icaoId']}",
-        description = f"{metar_data['name']}",
-        color       = discord.Color.blue()
-    )
-
-    # Add Other Fields
-    embed.add_field(name = "Latitude",                  value = f"{metar_data['lat']}"          )
-    embed.add_field(name = "Longitude",                 value = f"{metar_data['lon']}"          )
-    embed.add_field(name = "Altitude",                  value = f"{metar_data['elev']}"         )
-    embed.add_field(name = "Temperature (°C)",          value = f"{metar_data['temp']}°C"       )
-    embed.add_field(name = "Dew Point (°C)",            value = f"{metar_data['dewp']}°C"       )
-    embed.add_field(name = "Wind Direction",            value = f"{metar_data['wdir']}°"        )
-    embed.add_field(name = "Wind Speed (KT)",           value = f"{metar_data['wspd']} KT"      )
-    embed.add_field(name = "Visibility",                value = f"{metar_data['visib']}"        )
-    embed.add_field(name = "Altimeter (mb)",            value = f"{metar_data['altim']} mb"     )
-    embed.add_field(name = "Sea Level Pressure (mb)",   value = f"{metar_data['slp']} mb"       )
-    embed.add_field(name = "Report Time",               value = f"{metar_data['reportTime']}"   )
-
-    # Check if there are cloud cover data
-    if 'clouds' in metar_data:
-        clouds = metar_data['clouds']
-        cloud_info = "\n".join([f"{cloud['cover']} Clouds at {cloud['base']} feet" for cloud in clouds])
-        embed.add_field(name = "Cloud Cover", value = cloud_info)
-        
-    # Add raw METAR Info to Embed
-    embed.add_field(name = "Raw METAR", value = f"{metar_data['rawOb']}")
-
-    # Add airport picture as the thumbnail
-    global metar_embed_thumbnail_url
-    embed.set_thumbnail(url = metar_embed_thumbnail_url)
-
-    # Set Embed Footer
-    text = "Data Provided by Aviation Weather Center API."
-    embed.set_footer(text = text)
-
-    await ctx.send(embed = embed)
-    
-    
-async def get_metar_info(icao_code : str):
+async def get_metar_info(icao_code: str):
     """
     Description:
         Fetches METAR information for a specified airport ICAO code.
@@ -97,7 +97,6 @@ async def get_metar_info(icao_code : str):
         ValueError: If the provided ICAO code is not valid (incorrect format).
         requests.RequestException: If there is an issue with the HTTP request.
     """
-    
     # API URL for METAR info
     api_url = f"https://aviationweather.gov/cgi-bin/data/metar.php?ids={icao_code}&format=json"
     
@@ -112,5 +111,6 @@ async def get_metar_info(icao_code : str):
         else: return None
 
     # Log any Errors
-    except Exception as e: logger.error(e)
-
+    except Exception as e:
+        await logger.error(f"An error occurred in get_metar_info: {e}")
+        return None

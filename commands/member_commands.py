@@ -4,10 +4,13 @@ from discord.ext import commands
 
 # Import Bot & Logger Objects
 from bot import bot
-from logger import logInfo
+from logger import logger
 
 # Import Necessary Local Files
-from config import flight_hours, restricted_channels
+from config import config, flight_hours_manager
+
+# Import Other External Libraries
+from random import randrange
 
 @bot.event
 async def on_message_delete(message):
@@ -22,10 +25,13 @@ async def on_message_delete(message):
         None
     """
     
-    global restricted_channels
-    if message.channel.id in restricted_channels: return
-    try: await message.channel.send("SAW")
-    except Exception as e: logInfo(e)
+    # Don't send "SAW" if the channel is a restricted channel
+    if message.channel.id in config.restricted_channels: return
+    
+    # Otherwise send "SAW" for every one in three messages
+    try:
+        if randrange(1,4) == 1: await message.channel.send("SAW")
+    except Exception as e: await logger.error(f"An error occurred in on_message_delete: {e}")
 
     
 @bot.command()
@@ -41,20 +47,20 @@ async def dotspam(ctx, limit: int = 10):
     Returns:
         None
     """
-    
-    # Convert the Argument to Integer, throw Error if not an integer
-    try: limit = int(limit)
-    except ValueError:
-        await ctx.send("Please enter an integer value between 1 and 20.")
-        return
-    
-    # Check if the user provided a valid limit
-    if limit < 1 or limit > 20:
-        await ctx.send("Please enter an integer value between 1 and 20.")
-        return
+    try:
+        # Convert the Argument to Integer, throw Error if not an integer
+        limit = int(limit)
         
-    # Print as many times as the limit
-    for _ in range(limit): await ctx.send(".")
+        # Check if the user provided a valid limit
+        if limit < 1 or limit > 15:
+            await ctx.send("Please enter an integer value between 1 and 15.")
+            return
+            
+        # Print as many times as the limit
+        for _ in range(limit): await ctx.send(".")
+    
+    except ValueError: await ctx.send("Please enter an integer value between 1 and 15.")
+    except Exception as e: await logger.error(f"An error occurred in dotspam: {e}")
 
     
 def expected_role(minutes):
@@ -66,18 +72,18 @@ def expected_role(minutes):
         minutes (int) : Flight Time in minutes
 
     Returns:
-        None
+        str: The expected role based on flight time
     """
 
-    if   minutes > (8 * 60): return "First Class"
-    elif minutes > (5 * 60): return "Business Class"
-    elif minutes > (3  * 60): return "Premium Economy"
-    elif minutes > (1  * 60): return "Economy Class"
-    else: return "Member"
+    if   minutes > (5 * 60): return "First Class"
+    elif minutes > (3 * 60): return "Business Class"
+    elif minutes > (2 * 60): return "Premium Economy"
+    elif minutes > (1 * 60): return "Economy Class"
+    else:                    return "Member"
 
 
 @bot.command()
-async def flighttime(ctx):
+async def flighttime(ctx, member: discord.Member = None):
     """
     Description
         Returns the flight time of the command message author
@@ -88,30 +94,30 @@ async def flighttime(ctx):
     Returns:
         None
     """
-    
-    # Declare Global Variable
-    global flight_hours
-    flight_time = flight_hours.copy()
-    
-    # Retrieve the message author as the member name
-    member = ctx.message.author
-    highest_role = max(member.roles, key=lambda role: role.position)
-    embed_color = highest_role.color
-    
-    # Check if the member has flight hours recorded
-    hours, minutes = 0, 0
-    if member in list(flight_time.keys()): hours, minutes = divmod(flight_time[member.id], 60)
-    
-    # Format flight hours as a string
-    flight_time = f"{int(hours)} hours {int(minutes)} minutes"
+    try:
+        flight_time = flight_hours_manager.flight_hours.copy()
         
-    # Create an embed
-    embed = discord.Embed(title = f"Flight Time for {member_name}", color = embed_color)
-    embed.add_field(name = "Current Flight Hours", value = flight_time)
-    embed.add_field(name = "Expected Role", value = expected_role((hours * 60 + minutes)))
-    embed.set_thumbnail(url=ctx.message.author.avatar)
-    
-    await ctx.send(embed = embed)
+        # Retrieve the message author as the member name
+        if member is None: member = ctx.message.author
+        highest_role = max(member.roles, key=lambda role: role.position)
+        embed_color = highest_role.color
+        
+        # Check if the member has flight hours recorded
+        hours, minutes = 0, 0
+        if str(member.id) in flight_time.keys(): hours, minutes = divmod(flight_time[str(member.id)], 60)
+        
+        # Format flight hours as a string
+        flight_time_str = f"{int(hours)} hours {int(minutes)} minutes"
+            
+        # Create an embed
+        embed = discord.Embed(title=f"Flight Time for {member.display_name}", color=embed_color)
+        embed.add_field(name="Current Flight Hours", value=flight_time_str)
+        embed.add_field(name="Expected Role", value=expected_role((hours * 60 + minutes)))
+        embed.set_thumbnail(url=member.avatar.url)
+        
+        await ctx.send(embed=embed)
+        
+    except Exception as e: await logger.error(f"An error occurred in flighttime: {e}")
     
 
 @bot.command()
@@ -126,46 +132,48 @@ async def leaderboard(ctx):
     Returns:
         None
     """
+    try:
+        flight_time = flight_hours_manager.flight_hours.copy()
 
-    # Declare Global Variable
-    global flight_hours
-    flight_time = flight_hours.copy()
+        # Sort the Dictionary by Highest flight hours
+        sorted_flight_hours = dict(sorted(flight_time.items(), key=lambda item: item[1], reverse=True))
 
-    # Sort the Dictionary by Highest flight hours
-    logInfo("Sorting Leaderboard...")
-    sorted_flight_hours = dict(sorted(flight_time.items(), key=lambda item: item[1], reverse=True))
-
-    # Convert the sorted dictionary items into a list of tuples
-    sorted_items = list(sorted_flight_hours.items())
-    
-    # Display the top 10 values
-    limit = (10 if len(sorted_items) > 10 else len(sorted_items))
-    
-    # Print No Members Found if Limit is 0
-    if limit == 0: await ctx.send("There are currently no people on the leaderboard."); return;
-    
-    #Create the embed
-    embed = discord.Embed(
-        title = f"Flight Time Leaderboard",
-        color = discord.Color.blue(),
-        description = "Members with the Highest Flight Hours in GeoFS Events"
-    )
-           
-    # Set the server logo as the embed thumbnail
-    embed.set_thumbnail(url = ctx.guild.icon.url)
-    
-    # For every member
-    for i, (member_id, flight_time) in enumerate(sorted_items[:limit], start=1):
+        # Convert the sorted dictionary items into a list of tuples
+        sorted_items = list(sorted_flight_hours.items())
         
-        # Calculate the Flight Hours
-        hours, minutes = divmod(flight_time, 60)
-        flight_time = f"{int(hours)} hours {int(minutes)} minutes"
+        # Display the top 10 values
+        limit = min(10, len(sorted_items))
         
-        # Add the Information to the Embed
-        embed.add_field(name = f"#{i}: <@{member_id}>", value = flight_time, inline = False)
+        # Print No Members Found if Limit is 0
+        if limit == 0:
+            await ctx.send("There are currently no people on the leaderboard.")
+            return
+        
+        # Create the embed
+        embed = discord.Embed(
+            title="Flight Time Leaderboard",
+            color=discord.Color.blue(),
+            description="Members with the Highest Flight Hours in GeoFS Events"
+        )
+            
+        # Set the server logo as the embed thumbnail
+        embed.set_thumbnail(url=ctx.guild.icon.url)
+        
+        # For every member
+        for i, (member_id, flight_time) in enumerate(sorted_items[:limit], start=1):
+            
+            # Calculate the Flight Hours
+            hours, minutes = divmod(flight_time, 60)
+            flight_time_str = f"{int(hours)} hours {int(minutes)} minutes"
+            
+            # Add the Information to the Embed
+            member = await config.guild.fetch_member(member_id)
+            embed.add_field(name=f"#{i}: {member.name}", value=flight_time_str, inline=False)
+        
+        # Send the Embed
+        await ctx.send(embed=embed)
     
-    # Send the Embed
-    await ctx.send(embed=embed)
+    except Exception as e: await logger.error(f"An error occurred in leaderboard: {e}")
     
 
 @bot.command()
@@ -180,10 +188,11 @@ async def ping(ctx):
     Returns:
         None
     """
+    try:
+        latency = round(bot.latency * 1000)  # Convert to milliseconds
+        await ctx.send(f'Pong! Latency is {latency} ms')
     
-    try: latency = round(bot.latency * 1000)  # Convert to milliseconds
-    except Exception as e: logInfo(e)
-    await ctx.send(f'Pong! Latency is {latency} ms')
+    except Exception as e: await logger.error(f"An error occurred in ping command: {e}")
 
 @bot.command()
 async def quack(ctx):
@@ -197,5 +206,5 @@ async def quack(ctx):
     Returns:
         None
     """
-    
-    await ctx.send(':duck:')
+    try: await ctx.send(':duck:')
+    except Exception as e: await logger.error(f"An error occurred in quack command: {e}")

@@ -4,7 +4,7 @@ from discord.ext import commands
 
 # Import Bot & Logger Objects
 from bot import bot
-from logger import logInfo
+from logger import logger
 
 @bot.command()
 async def help(ctx):

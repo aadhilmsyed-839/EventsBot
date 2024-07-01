@@ -1,43 +1,23 @@
 # Import Discord Python Libraries
 import discord
 from discord.ext import commands
-from bot import bot
 
-# Import the Log Channel Variable
-from config import log_channel
+from config import config
 
-@bot.command()
-@commands.has_permissions(manage_channels=True)
-async def setLogChannel(ctx, channel: discord.TextChannel):
-    """
-    Description:
-        Sets the Log Channel in the Server to Print Bot Information and Status
+class Logger:
 
-    Arguments:
-        ctx                             : The context object
-        channel (discord.TextChannel)   : The channel to set as the log channel
-        
-    Returns:
-        None
-    """
-    
-    global log_channel
-    log_channel = channel
-    logInfo(f"Bot Log Channel Set as {channel}")
+    def __init__(self, channel: discord.TextChannel): self.log_channel = channel
+
+    async def setChannel(self, channel: discord.TextChannel):
+        self.log_channel = channel
+        await self.info(f"Log channel set to {channel.mention}")
+
+    async def info(self, message: str):
+        if self.log_channel: await self.log_channel.send(message)
+
+    async def error(self, message: str):
+        if self.log_channel: await self.log_channel.send(f"ERROR: {message}")
 
 
-async def logInfo(info: str):
-    """
-    Description:
-        Sends Logger Information to the Specified Log Channel if it exists
-
-    Arguments:
-        info (str) : The message to be sent to the log channel
-        
-    Returns:
-        None
-    """
-    
-    global log_channel
-    if log_channel: await log_channel.send(info)
-
+log_channel = config.log_channel
+logger = Logger(log_channel)
