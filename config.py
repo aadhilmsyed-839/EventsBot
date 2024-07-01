@@ -16,8 +16,8 @@ class Configurations:
         self.restricted_channels = []
         self.metar_embed_thumbnail_url = "https://media.istockphoto.com/id/537337166/photo/air-trafic-control-tower-and-airplance-at-paris-airport.jpg?b=1&s=612x612&w=0&k=20&c=kp14V8AXFNUh5jOy3xPQ_sxhOZLWXycdBL-eUGviMOQ="
         self.roles = {  # Role ID, Hours
-            989232534313369630: 5,
-            1110680241569017966: 3,
+            989232534313369630: 8,
+            1110680241569017966: 5,
             1110680332879011882: 2,
             1112981412191146004: 1
         }
