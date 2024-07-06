@@ -53,8 +53,8 @@ async def help(ctx):
         inline = False
     )
     embed.add_field(
-        name = "!featherwaysays",
-        value = "Sends a message to the channel containing whatever the input was. Example Usage: !featherwaysays don't chop me pen plzzz",
+        name = "!copilotsays",
+        value = "Sends a message to the channel containing whatever the input was. Example Usage: !copilotsays Join The Event",
         inline = False
     )
     embed.add_field(

@@ -12,27 +12,26 @@ from config import config, flight_hours_manager
 # Import Other External Libraries
 from random import randrange
 
-@bot.event
-async def on_message_delete(message):
+@bot.command()
+async def copilotsays(ctx, *, message: str):
     """
-    Description:
-        Sends "SAW" to the channel when a message is deleted if the channel is not a restricted channel
-
+    Command to repeat the input message and delete the command message.
+    
     Parameters:
-        message (discord.Message): The deleted message object.
-
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        message (str): The message to repeat.
+    
     Returns:
         None
     """
-    
-    # Don't send "SAW" if the channel is a restricted channel
-    if message.channel.id in config.restricted_channels: return
-    
-    # Otherwise send "SAW" for every one in three messages
     try:
-        if randrange(1,4) == 1: await message.channel.send("SAW")
-    except Exception as e: await logger.error(f"An error occurred in on_message_delete: {e}")
-
+        # Send the input message to the channel
+        await ctx.send(message)
+        
+        # Delete the command message
+        await ctx.message.delete()
+    
+    except Exception as e: await logger.error(f"An error occurred: {e}")
     
 @bot.command()
 async def dotspam(ctx, limit: int = 10):
@@ -80,27 +79,6 @@ def expected_role(minutes):
     elif minutes > (2 * 60): return "Premium Economy"
     elif minutes > (1 * 60): return "Economy Class"
     else:                    return "Member"
-
-@bot.command()
-async def featherwaysays(ctx, *, message: str):
-    """
-    Command to repeat the input message and delete the command message.
-    
-    Parameters:
-        ctx (discord.ext.commands.Context): The context object representing the command's context.
-        message (str): The message to repeat.
-    
-    Returns:
-        None
-    """
-    try:
-        # Send the input message to the channel
-        await ctx.send(message)
-        
-        # Delete the command message
-        await ctx.message.delete()
-    
-    except Exception as e: await ctx.send(f"An error occurred: {e}")
 
 
 @bot.command()
@@ -196,6 +174,26 @@ async def leaderboard(ctx):
     
     except Exception as e: await logger.error(f"An error occurred in leaderboard: {e}")
     
+@bot.event
+async def on_message_delete(message):
+    """
+    Description:
+        Sends "SAW" to the channel when a message is deleted if the channel is not a restricted channel
+
+    Parameters:
+        message (discord.Message): The deleted message object.
+
+    Returns:
+        None
+    """
+    
+    # Don't send "SAW" if the channel is a restricted channel
+    if message.channel.id in config.restricted_channels: return
+    
+    # Otherwise send "SAW" for every one in three messages
+    try:
+        if randrange(1,4) == 1: await message.channel.send("SAW")
+    except Exception as e: await logger.error(f"An error occurred in on_message_delete: {e}")
 
 @bot.command()
 async def ping(ctx):
