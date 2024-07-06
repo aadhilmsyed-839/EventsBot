@@ -52,6 +52,11 @@ async def help(ctx):
         value = "Checkout who has the most flight hours logged for the current month. Example Usage: !leaderboard",
         inline = False
     )
+        embed.add_field(
+        name = "!featherwaysays",
+        value = "Sends a message to the channel containing whatever the input was. Example Usage: !featherwaysays don't chop me pen plzzz",
+        inline = False
+    )
     embed.add_field(
         name = "Event Participation.",
         value = "By participating in our events, you can increase your flight hours. At the end of each month, roles will be udpated to reflect flight activity, so make sure to join us whenever you can. We are thrilled to have you here at GeoFS Events, and we hope you enjoy your time here. :)",

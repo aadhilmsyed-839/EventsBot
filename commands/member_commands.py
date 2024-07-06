@@ -81,6 +81,27 @@ def expected_role(minutes):
     elif minutes > (1 * 60): return "Economy Class"
     else:                    return "Member"
 
+@bot.command()
+async def featherwaysays(ctx, *, message: str):
+    """
+    Command to repeat the input message and delete the command message.
+    
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        message (str): The message to repeat.
+    
+    Returns:
+        None
+    """
+    try:
+        # Send the input message to the channel
+        await ctx.send(message)
+        
+        # Delete the command message
+        await ctx.message.delete()
+    
+    except Exception as e: await ctx.send(f"An error occurred: {e}")
+
 
 @bot.command()
 async def flighttime(ctx, member: discord.Member = None):
