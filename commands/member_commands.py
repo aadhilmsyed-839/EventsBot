@@ -113,7 +113,7 @@ async def flighttime(ctx, member: discord.Member = None):
         embed = discord.Embed(title=f"Flight Time for {member.display_name}", color=embed_color)
         embed.add_field(name="Current Flight Hours", value=flight_time_str)
         embed.add_field(name="Expected Role", value=expected_role((hours * 60 + minutes)))
-        embed.set_thumbnail(url=member.avatar.url)
+        embed.set_thumbnail(url = member.avatar.url if member.avatar else "https://sm.mashable.com/mashable_me/seo/default/discord_4r4y.jpg")
         
         await ctx.send(embed=embed)
         
