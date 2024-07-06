@@ -52,7 +52,7 @@ async def help(ctx):
         value = "Checkout who has the most flight hours logged for the current month. Example Usage: !leaderboard",
         inline = False
     )
-        embed.add_field(
+    embed.add_field(
         name = "!featherwaysays",
         value = "Sends a message to the channel containing whatever the input was. Example Usage: !featherwaysays don't chop me pen plzzz",
         inline = False
