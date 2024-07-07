@@ -191,7 +191,7 @@ async def on_message_delete(message):
     if message.channel.id in config.restricted_channels: return
     
     # if the message is a bot command, then ignore
-    if message.contents.split(" ")[0][0] == '!': return
+    if message.content.split(" ")[0][0] == '!': return
     
     # Otherwise send "SAW" for every one in three messages
     try:
