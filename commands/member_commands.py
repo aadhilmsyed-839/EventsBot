@@ -29,9 +29,7 @@ async def copilotsays(ctx, *, message: str):
         await ctx.send(message)
         
         # Delete the command message
-        config.restricted_channels.append(ctx.message.channel.id)
         await ctx.message.delete()
-        config.restricted_channels.remove(ctx.message.channel.id)
     
     except Exception as e: await logger.error(f"An error occurred: {e}")
     
@@ -191,6 +189,9 @@ async def on_message_delete(message):
     
     # Don't send "SAW" if the channel is a restricted channel
     if message.channel.id in config.restricted_channels: return
+    
+    # if the message is a bot command, then ignore
+    if message.contents.split(" ")[0][0] == '!': return
     
     # Otherwise send "SAW" for every one in three messages
     try:
