@@ -29,7 +29,9 @@ async def copilotsays(ctx, *, message: str):
         await ctx.send(message)
         
         # Delete the command message
+        config.restricted_channels.append(ctx.message.channel)
         await ctx.message.delete()
+        config.restricted_channels.remove(channel.id)
     
     except Exception as e: await logger.error(f"An error occurred: {e}")
     
