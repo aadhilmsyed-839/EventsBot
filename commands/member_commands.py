@@ -197,6 +197,28 @@ async def on_message_delete(message):
     try:
         if randrange(1,4) == 1: await message.channel.send("SAW")
     except Exception as e: await logger.error(f"An error occurred in on_message_delete: {e}")
+    
+@bot.event
+async def on_reaction_add(reaction, user):
+    """
+    Description:
+        Sends "SAW" to the channel when a reaction is removed if the channel is not a restricted channel
+
+    Parameters:
+        reaction (discord.Reaction): The deleted reaction
+        user (discord.User): The user who sent the reaction
+
+    Returns:
+        None
+    """
+    
+    # Don't send "SAW" if the channel is a restricted channel
+    if reaction.message.channel.id in config.restricted_channels: return
+    
+    # Otherwise send "SAW" for every one in three messages
+    try:
+        if randrange(1,4) == 1: await reaction.message.channel.send("SAW")
+    except Exception as e: await logger.error(f"An error occurred in on_reaction_add: {e}")
 
 @bot.command()
 async def ping(ctx):
