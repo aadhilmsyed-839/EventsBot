@@ -199,7 +199,7 @@ async def on_message_delete(message):
     except Exception as e: await logger.error(f"An error occurred in on_message_delete: {e}")
     
 @bot.event
-async def on_reaction_add(reaction, user):
+async def on_reaction_remove(reaction, user):
     """
     Description:
         Sends "SAW" to the channel when a reaction is removed if the channel is not a restricted channel
