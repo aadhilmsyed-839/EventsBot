@@ -6,3 +6,7 @@ pandas
 pytz
 requests
 flask
+pytube
+ffmpeg
+pynacl
+youtube_dl
