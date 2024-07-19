@@ -44,7 +44,7 @@ class FlightHours:
         self._flight_hours = {}
         self._start_time = {}
         self._is_event_active = False
-        self._voice_channel = None
+        self._voice_channels = []
 
     @property
     def flight_hours(self): return self._flight_hours
@@ -56,13 +56,13 @@ class FlightHours:
     def is_event_active(self): return self._is_event_active
 
     @property
-    def voice_channel(self): return self._voice_channel
+    def voice_channels(self): return self._voice_channels
 
     @is_event_active.setter
     def is_event_active(self, value): self._is_event_active = value
 
-    @voice_channel.setter
-    def voice_channel(self, channel): self._voice_channel = channel
+    @voice_channels.setter
+    def voice_channels(self, channels): self._voice_channels = channels
 
     def log_start_time(self, member_id):
         if str(member_id) not in self._start_time: self._start_time[str(member_id)] = time.now(pytz.utc)
@@ -79,9 +79,10 @@ class FlightHours:
         
     def save(self, file_path="data/flight_hours.json"):
         start_time_str = {k: v.isoformat() for k, v in self._start_time.items()}
+        voice_channel_ids = [channel.id for channel in self._voice_channels]
         data = {
             "is_event_active": self._is_event_active,
-            "voice_channel": self._voice_channel.id if self._voice_channel else None,
+            "voice_channels": voice_channel_ids,
             "flight_hours": self._flight_hours,
             "start_time": start_time_str
         }
@@ -92,7 +93,7 @@ class FlightHours:
             with open(file_path, "r") as file:
                 data = json.load(file)
                 self._is_event_active = data.get("is_event_active", False)
-                self._voice_channel = data.get("voice_channel", None)
+                self._voice_channels = data.get("voice_channels", [])
                 self._flight_hours = data.get("flight_hours", {})
                 self._start_time = {k: time.fromisoformat(v) for k, v in data.get("start_time", {}).items()}
                 
@@ -102,6 +103,7 @@ class FlightHours:
                 member = await config.guild.fetch_member(member_id)
                 hours, minutes = divmod(minutes, 60)
                 file.write(f"{member.name}: {hours} hours & {minutes} minutes\n")
+
 
 # Create Objects
 config = Configurations()

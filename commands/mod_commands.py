@@ -97,29 +97,76 @@ async def view_restricted_channels(ctx):
 
 @bot.command()
 @commands.has_permissions(manage_channels=True)
-async def toggle_voice_channel(ctx, channel: discord.VoiceChannel = None):
+async def add_event_vc(ctx, channel: discord.VoiceChannel = None):
     """
     Description:
-        Changes/Adds/Removes the Voice Channel to Track during an Event. If no argument is specified,
-        then the voice_channel is set to None. Otherwise if a channel is passed as an argument, then
-        that voice channel is assigned to the variable.
+        Adds the Voice Channel to the tracked list during an Event.
         
     Arguments:
         ctx : The command object
-        channels (discord.TextChannel) : Channel to be Assigned as the Event Voice Channel
+        channels (discord.TextChannel) : Channel to be added as an Event Voice Channel
         
     Returns:
         None
     """
     try:
+    
+        if not flight_hours_manager._is_event_active:
+            await ctx.send("You cannot add an event VC. There is currently no active event.")
+            return
+        
         # Set the Voice Channel to the argument
-        flight_hours_manager.voice_channel = channel
-        await logger.info(f"Event Voice Channel was set to {channel} by {ctx.message.author}.")
-        await ctx.send(f"Event Voice Channel was set to {channel} by {ctx.message.author}.")
+        flight_hours_manager.voice_channels.append(channel)
+        await logger.info(f"{channel.mention} was added as an event voice channel by {ctx.message.author.mention}.")
+        await ctx.send(f"{channel.mention} was added as an event voice channel.")
+        
+        # If Members Are Already in the Voice Channel, Log Them
+        for member in channel.members:
+            flight_hours_manager.log_start_time(member.id)
+            await logger.info(f"{member.mention} Joined the Event. Starting Logging...")
         
         flight_hours_manager.save()
     
     except Exception as e: await logger.error(f"An error occurred in toggle_voice_channel: {e}")
+    
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def remove_event_vc(ctx, channel: discord.VoiceChannel = None):
+    """
+    Description:
+        Removes the Voice Channel from the tracked list during an Event.
+        
+    Arguments:
+        ctx : The command object
+        channel (discord.VoiceChannel) : Channel to be removed from the Event Voice Channel list
+        
+    Returns:
+        None
+    """
+    try:
+        if not flight_hours_manager.is_event_active:
+            await ctx.send("You cannot remove an event VC. There is currently no active event.")
+            return
+
+        if channel not in flight_hours_manager.voice_channels:
+            await ctx.send(f"{channel.mention} is not an event voice channel.")
+            return
+
+        # Remove the Voice Channel from the list
+        flight_hours_manager.voice_channels.remove(channel)
+        await logger.info(f"{channel.mention} was removed as an event voice channel by {ctx.message.author.mention}.")
+        await ctx.send(f"{channel.mention} was removed as an event voice channel.")
+        
+        # If Members Are in the Voice Channel, End Their Logging
+        for member in channel.members:
+            elapsed_minutes = flight_hours_manager.log_end_time(member.id)
+            await logger.info(f"{member.mention} Left the Event. Ending Logging...")
+            await logger.info(f"{int(elapsed_minutes)} minutes of flight time was added to <@{member.id}>")
+            await logger.info(f"<@{member.id}> Has a Total Flight Time of {int(flight_hours_manager.flight_hours[str(member.id)])} Minutes.")
+        
+        flight_hours_manager.save()
+    
+    except Exception as e: await logger.error(f"An error occurred in remove_event_vc: {e}")
     
     
 @bot.command()
@@ -148,7 +195,6 @@ async def add_flight_time(ctx, member: discord.Member, minutes: int):
         # Send a Message to the Channel and the Logger
         await ctx.send(f"{minutes} minutes were added to {member.mention} by {ctx.message.author.mention}.")
         await logger.info(f"{minutes} minutes were added to {member.mention} by {ctx.message.author.mention}.")
-        
         flight_hours_manager.save()
     
     except Exception as e: await logger.error(f"An error occurred in add_flight_time: {e}")
@@ -181,7 +227,6 @@ async def remove_flight_time(ctx, member: discord.Member, minutes: int):
         # Send a Message to the Channel and the Logger
         await ctx.send(f"{minutes} minutes were removed from {member.mention} by {ctx.message.author.mention}.")
         await logger.info(f"{minutes} minutes were removed from {member.mention} by {ctx.message.author.mention}.")
-        
         flight_hours_manager.save()
     
     except Exception as e: await logger.error(f"An error occurred in remove_flight_time: {e}")
