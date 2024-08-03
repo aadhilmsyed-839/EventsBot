@@ -58,8 +58,13 @@ async def help(ctx):
         inline = False
     )
     embed.add_field(
+        name = "!spam",
+        value = "Spams the message to the channel containing whatever the input was. Example Usage: !spam Join The Event",
+        inline = False
+    )
+    embed.add_field(
         name = "Event Participation.",
-        value = "By participating in our events, you can increase your flight hours. At the end of each month, roles will be udpated to reflect flight activity, so make sure to join us whenever you can. We are thrilled to have you here at GeoFS Events, and we hope you enjoy your time here. :)",
+        value = "By participating in our events, you can increase your flight hours. At the end of each month, roles will be updated to reflect flight activity, so make sure to join us whenever you can. We are thrilled to have you here at GeoFS Events, and we hope you enjoy your time here. :)",
         inline = False
     )
     
