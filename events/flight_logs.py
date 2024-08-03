@@ -39,17 +39,19 @@ async def on_voice_state_update(member, before, after):
         
         # If The User Joins the Event Voice Channel, Start Logging For Them
         if after.channel in flight_hours_manager.voice_channels and before.channel not in flight_hours_manager.voice_channels:
-            await logger.info(f"{member.mention} Joined the Event. Starting Logging...")
+            if member.bot: return
             flight_hours_manager.log_start_time(member.id)
+            await logger.info(f"{member.mention} Joined {after.channel.mention}. Starting Logging...")
             flight_hours_manager.save()
             return
             
         # If The User Leaves the Event Voice Channel, End Their Logging and Update their Flight Hours
         if before.channel in flight_hours_manager.voice_channels and after.channel not in flight_hours_manager.voice_channels:
-            await logger.info(f"{member.mention} Left the Event. Ending Logging...")
+            if member.bot: return
+            await logger.info(f"{member.mention} Left the {before.channel.mention}. Ending Logging...")
             elapsed_minutes = flight_hours_manager.log_end_time(member.id)
-            await logger.info(f"{int(elapsed_minutes)} minutes of flight time was added to <@{member.id}>")
-            await logger.info(f"<@{member.id}> Has a Total Flight Time of {int(flight_hours_manager.flight_hours[str(member.id)])} Minutes.")
+            await logger.info(f"{int(elapsed_minutes)} minutes of flight time was added to {member.mention}")
+            await logger.info(f"{member.mention} Has a Total Flight Time of {int(flight_hours_manager.flight_hours[str(member.id)])} Minutes.")
             flight_hours_manager.save()
             return
             
@@ -87,6 +89,7 @@ async def on_scheduled_event_update(before, after):
             
             # If Members Are Already in the Voice Channel, Log Them
             for member in flight_hours_manager.voice_channels[0].members:
+                if member.bot: continue
                 flight_hours_manager.log_start_time(member.id)
                 await logger.info(f"{member.mention} Joined the Event. Starting Logging...")
             
@@ -105,10 +108,12 @@ async def on_scheduled_event_update(before, after):
             
             # Update Logger Information
             await logger.info(f"Ending Flight Logging for Event '{before.name}'.")
+            await logger.info(f"A total of {flight_hours_manager.num_joined} members joined.")
             
             # Update the Event Voice Channel and Event Status Flag
             flight_hours_manager.voice_channels.clear()
             flight_hours_manager.is_event_active = False
+            flight_hours_manager.num_joined = 0
             
             flight_hours_manager.save()
             return
