@@ -246,9 +246,10 @@ async def view_flight_time(ctx):
     """
     
     # Send the Flight Hours as a Text File to the Log Channel
-    await logger.info("Processing Flight Hours Text File...")
+    await ctx.send("Processing Flight Hours Text File...")
+    await ctx.send("This may take a while.")
     file_path = "data/role_updates.txt"
     await flight_hours_manager.export(file_path)
     with open(file_path, "rb") as file:
-        await config.log_channel.send("Exported flight hours:", file=discord.File(file, file_path))
+        await ctx.send("Exported flight hours:", file=discord.File(file, file_path))
 
