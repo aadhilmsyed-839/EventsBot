@@ -245,17 +245,10 @@ async def view_flight_time(ctx):
         None
     """
     
-    # Create an embed object
-    embed = discord.Embed(title="Flight Time of Members in GeoFS Events", color=discord.Color.blue())
-    embed.set_thumbnail(url=ctx.guild.icon.url)
-    
-    # Loop through flight hours and add them to the embed
-    for member_id, minutes in flight_hours_manager.flight_hours.items():
-        member = None
-        try: member = await config.guild.fetch_member(member_id)
-        except Exception as e: member = None
-        flight_time = f"{minutes // 60} hours {minutes % 60} minutes"
-        if member: embed.add_field(name=f"{member.name}", value=flight_time, inline=False)
-    
-    # Send the embed
-    await ctx.send(embed=embed)
+    # Send the Flight Hours as a Text File to the Log Channel
+    await logger.info("Processing Flight Hours Text File...")
+    file_path = "data/role_updates.txt"
+    await flight_hours_manager.export(file_path)
+    with open(file_path, "rb") as file:
+        await config.log_channel.send("Exported flight hours:", file=discord.File(file, file_path))
+
