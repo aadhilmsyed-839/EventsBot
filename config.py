@@ -111,7 +111,7 @@ class FlightHours:
             for member_id, minutes in self._flight_hours.items():
                 member = await config.guild.fetch_member(member_id)
                 hours, minutes = divmod(minutes, 60)
-                file.write(f"{member.name}: {hours} hours {minutes} minutes\n")
+                if member: file.write(f"{member.name}: {hours} hours {minutes} minutes\n")
 
 
 # Create Objects
