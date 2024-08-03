@@ -109,7 +109,9 @@ class FlightHours:
     async def export(self, file_path):
         with open(file_path, "w") as file:
             for member_id, minutes in self._flight_hours.items():
-                member = await config.guild.fetch_member(member_id)
+                member = None
+                try: member = await config.guild.fetch_member(member_id)
+                except Exception as e: member = None
                 hours, minutes = divmod(minutes, 60)
                 if member: file.write(f"{member.name}: {hours} hours {minutes} minutes\n")
 

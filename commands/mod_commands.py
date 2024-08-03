@@ -251,7 +251,9 @@ async def view_flight_time(ctx):
     
     # Loop through flight hours and add them to the embed
     for member_id, minutes in flight_hours_manager.flight_hours.items():
-        member = await config.guild.fetch_member(member_id)
+        member = None
+        try: member = await config.guild.fetch_member(member_id)
+        except Exception as e: member = None
         flight_time = f"{minutes // 60} hours {minutes % 60} minutes"
         if member: embed.add_field(name=f"{member.name}", value=flight_time, inline=False)
     
