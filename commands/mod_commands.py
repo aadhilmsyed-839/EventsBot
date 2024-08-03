@@ -248,7 +248,7 @@ async def view_flight_time(ctx):
     
     message_str = "Flight Time of Members in GeoFS Events:"
     
-    for member_id, minutes in flight_hours.manager.flight_hours.items():
+    for member_id, minutes in flight_hours_manager.flight_hours.items():
         message_str += f"\n- <@{member_id}>: {minutes // 60} hours {minutes % 60} minutes"
         
     await ctx.send(message_str)
