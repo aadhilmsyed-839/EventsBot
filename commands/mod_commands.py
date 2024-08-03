@@ -230,8 +230,7 @@ async def remove_flight_time(ctx, member: discord.Member, minutes: int):
         flight_hours_manager.save()
     
     except Exception as e: await logger.error(f"An error occurred in remove_flight_time: {e}")
-    
-    
+
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def view_flight_time(ctx):
@@ -246,9 +245,15 @@ async def view_flight_time(ctx):
         None
     """
     
-    message_str = "Flight Time of Members in GeoFS Events:"
+    # Create an embed object
+    embed = discord.Embed(title="Flight Time of Members in GeoFS Events", color=discord.Color.blue())
+    embed.set_thumbnail(url=ctx.guild.icon.url)
     
+    # Loop through flight hours and add them to the embed
     for member_id, minutes in flight_hours_manager.flight_hours.items():
-        message_str += f"\n- <@{member_id}>: {minutes // 60} hours {minutes % 60} minutes"
-        
-    await ctx.send(message_str)
+        member = await config.guild.fetch_member(member_id)
+        flight_time = f"{minutes // 60} hours {minutes % 60} minutes"
+        if member: embed.add_field(name=f"{member.name}", value=flight_time, inline=False)
+    
+    # Send the embed
+    await ctx.send(embed=embed)
