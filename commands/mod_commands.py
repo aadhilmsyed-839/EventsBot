@@ -230,3 +230,25 @@ async def remove_flight_time(ctx, member: discord.Member, minutes: int):
         flight_hours_manager.save()
     
     except Exception as e: await logger.error(f"An error occurred in remove_flight_time: {e}")
+    
+    
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def view_flight_time(ctx):
+    """
+    Description:
+        Shows the flight time of all members in the database
+        
+    Arguments:
+        ctx : The command object
+        
+    Return:
+        None
+    """
+    
+    message_str = "Flight Time of Members in GeoFS Events:"
+    
+    for member_id, minutes in flight_hours.manager.flight_hours.items():
+        message_str += f"\n- <@{member_id}>: {minutes // 60} hours {minutes % 60} minutes"
+        
+    await ctx.send(message_str)
