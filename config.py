@@ -45,6 +45,7 @@ class FlightHours:
         self._start_time = {}
         self._is_event_active = False
         self._voice_channels = []
+        self._num_joined = 0
 
     @property
     def flight_hours(self): return self._flight_hours
@@ -57,15 +58,23 @@ class FlightHours:
 
     @property
     def voice_channels(self): return self._voice_channels
+    
+    @property
+    def num_joined(self): return self._num_joined
 
     @is_event_active.setter
     def is_event_active(self, value): self._is_event_active = value
 
     @voice_channels.setter
     def voice_channels(self, channels): self._voice_channels = channels
+    
+    @num_joined.setter
+    def num_joined(self, value): self._num_joined = value
 
     def log_start_time(self, member_id):
-        if str(member_id) not in self._start_time: self._start_time[str(member_id)] = time.now(pytz.utc)
+        if str(member_id) not in self._start_time:
+            self._start_time[str(member_id)] = time.now(pytz.utc)
+            self._num_joined += 1
 
     def log_end_time(self, member_id):
         if str(member_id) in self._start_time:
@@ -102,7 +111,7 @@ class FlightHours:
             for member_id, minutes in self._flight_hours.items():
                 member = await config.guild.fetch_member(member_id)
                 hours, minutes = divmod(minutes, 60)
-                file.write(f"{member.name}: {hours} hours & {minutes} minutes\n")
+                file.write(f"{member.name}: {hours} hours {minutes} minutes\n")
 
 
 # Create Objects
