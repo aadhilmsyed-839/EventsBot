@@ -25,6 +25,10 @@ async def copilotsays(ctx, *, message: str):
         None
     """
     try:
+    
+        for word in message.split(" "):
+            if word[0] == "@": await ctx.send("You cannot ping using the bot."); return;
+    
         # Send the input message to the channel
         await ctx.send(message)
         
@@ -54,6 +58,8 @@ async def dotspam(ctx, limit: int = 10):
         if limit < 1 or limit > 15:
             await ctx.send("Please enter an integer value between 1 and 15.")
             return
+            
+        await ctx.message.delete()
             
         # Print as many times as the limit
         for _ in range(limit): await ctx.send(".")
@@ -252,3 +258,28 @@ async def quack(ctx):
     """
     try: await ctx.send(':duck:')
     except Exception as e: await logger.error(f"An error occurred in quack command: {e}")
+
+@bot.command()
+async def spam(ctx, *, message: str):
+    """
+    Command to spam a given message
+    
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        message (str): The message to spam.
+    
+    Returns:
+        None
+    """
+    try:
+    
+        for word in message.split(" "):
+            if word[0] == "@": await ctx.send("You cannot ping using the bot."); return;
+    
+        # Send the input message to the channel
+        for _ in range(5): await ctx.send(message)
+        
+        # Delete the command message
+        await ctx.message.delete()
+    
+    except Exception as e: await logger.error(f"An error occurred: {e}")
