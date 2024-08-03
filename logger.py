@@ -16,7 +16,7 @@ class Logger:
         if self.log_channel: await self.log_channel.send(message)
 
     async def error(self, message: str):
-        if self.log_channel: await self.log_channel.send(f"ERROR: {message}")
+        if self.log_channel: await self.log_channel.send(f"**ERROR:** {message}")
 
 
 log_channel = config.log_channel
