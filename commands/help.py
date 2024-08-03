@@ -23,7 +23,7 @@ async def help(ctx):
     embed = discord.Embed(
         title = f"GeoFS Events CoPilot",
         color = discord.Color.blue(),
-        description = "Your Gateway to an Enhanced Flight Simulation Experience"
+        description = "Your Gateway to an Enhanced Flight Simulation Experience. Version: v1.12"
     )
     
     # Add the Member Commands
