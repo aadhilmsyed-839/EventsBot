@@ -253,3 +253,26 @@ async def view_flight_time(ctx):
     with open(file_path, "rb") as file:
         await ctx.send("Exported flight hours:", file=discord.File(file, file_path))
 
+
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def copilotsays(ctx, *, message: str):
+    """
+    Command to repeat the input message and delete the command message.
+    
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        message (str): The message to repeat.
+    
+    Returns:
+        None
+    """
+    try:
+    
+        # Send the input message to the channel
+        await ctx.send(message)
+        
+        # Delete the command message
+        await ctx.message.delete()
+    
+    except Exception as e: await logger.error(f"An error occurred: {e}")

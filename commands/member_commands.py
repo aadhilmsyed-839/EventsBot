@@ -11,31 +11,6 @@ from config import config, flight_hours_manager
 
 # Import Other External Libraries
 from random import randrange
-
-@bot.command()
-async def copilotsays(ctx, *, message: str):
-    """
-    Command to repeat the input message and delete the command message.
-    
-    Parameters:
-        ctx (discord.ext.commands.Context): The context object representing the command's context.
-        message (str): The message to repeat.
-    
-    Returns:
-        None
-    """
-    try:
-    
-        for word in message.split(" "):
-            if word[0] == "@": await ctx.send("You cannot ping using the bot."); return;
-    
-        # Send the input message to the channel
-        await ctx.send(message)
-        
-        # Delete the command message
-        await ctx.message.delete()
-    
-    except Exception as e: await logger.error(f"An error occurred: {e}")
     
 @bot.command()
 async def dotspam(ctx, limit: int = 10):
@@ -259,27 +234,27 @@ async def quack(ctx):
     try: await ctx.send(':duck:')
     except Exception as e: await logger.error(f"An error occurred in quack command: {e}")
 
-@bot.command()
-async def spam(ctx, *, message: str):
-    """
-    Command to spam a given message
-    
-    Parameters:
-        ctx (discord.ext.commands.Context): The context object representing the command's context.
-        message (str): The message to spam.
-    
-    Returns:
-        None
-    """
-    try:
-    
-        for word in message.split(" "):
-            if word[0] == "@": await ctx.send("You cannot ping using the bot."); return;
-    
-        # Send the input message to the channel
-        for _ in range(5): await ctx.send(message)
-        
-        # Delete the command message
-        await ctx.message.delete()
-    
-    except Exception as e: await logger.error(f"An error occurred: {e}")
+#@bot.command()
+#async def spam(ctx, *, message: str):
+#    """
+#    Command to spam a given message
+#
+#    Parameters:
+#        ctx (discord.ext.commands.Context): The context object representing the command's context.
+#        message (str): The message to spam.
+#
+#    Returns:
+#        None
+#    """
+#    try:
+#
+#        for word in message.split(" "):
+#            if word[0] == "@": await ctx.send("You cannot ping using the bot."); return;
+#
+#        # Send the input message to the channel
+#        for _ in range(5): await ctx.send(message)
+#
+#        # Delete the command message
+#        await ctx.message.delete()
+#
+#    except Exception as e: await logger.error(f"An error occurred: {e}")
