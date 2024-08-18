@@ -52,8 +52,6 @@ Here's an overview of the project's file structure to help you navigate the code
 
 ## Contributing
 
-We welcome contributions from the GeoFS community! Whether you're a developer interested in enhancing the bot's capabilities or a user with suggestions for improvements, we encourage you to get involved. You can contribute by creating issues, making pull requests, or following our coding style guide.
-
 For contributions, please message `the._.pickle` on Discord.
 
 ## Usage Terms
