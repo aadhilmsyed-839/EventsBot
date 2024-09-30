@@ -45,7 +45,7 @@ class FlightHours:
         self._start_time = {}
         self._is_event_active = False
         self._voice_channels = []
-        self._num_joined = 0
+        self._joined_event = set()
 
     @property
     def flight_hours(self): return self._flight_hours

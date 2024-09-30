@@ -1,4 +1,3 @@
-# Import Discord Python Libraries
 import discord
 from discord.ext import commands
 
@@ -13,10 +12,10 @@ class Logger:
         await self.info(f"Log channel set to {channel.mention}")
 
     async def info(self, message: str):
-        if self.log_channel: await self.log_channel.send(message)
+        if self.log_channel is not None: await self.log_channel.send(message)
 
     async def error(self, message: str):
-        if self.log_channel: await self.log_channel.send(f"**ERROR:** {message}")
+        if self.log_channel is not None: await self.log_channel.send(f"**ERROR:** {message}")
 
 
 log_channel = config.log_channel

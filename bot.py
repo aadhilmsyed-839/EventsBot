@@ -65,5 +65,6 @@ async def on_ready():
             break
             
 @bot.event
-async def on_command_error(ctx, error): await logger.error(error)
+async def on_command_error(ctx, error):
+    await logger.error(error)
 
