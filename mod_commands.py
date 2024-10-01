@@ -321,8 +321,8 @@ async def view_member_history(ctx, member: discord.Member):
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if the member has attended at least one event
-    if not flight_hours_manager.member_history: await ctx.send(f"{member.mention} has not attended any events for the current month.")
-    if not flight_hours_manager.member_history[str(member.id)]: await ctx.send(f"{member.mention} has not attended any events for the current month.")
+    if not flight_hours_manager.member_history: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
+    if not flight_hours_manager.member_history[str(member.id)]: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
     
     # Otherwise print all the channels
     events_str = f"## Events Attended for {member.mention}"
@@ -349,11 +349,11 @@ async def view_event_history(ctx, event_index = 0):
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if there have been any events in the current month
-    if flight_hours_manager.event_history: await ctx.send("There have not been any events in the current month.")
+    if flight_hours_manager.event_history: await ctx.send("There have not been any events in the current month."); return
     
     # Check if the event index is valid
     num_events = len(flight_hours_manager.event_history)
-    if event_index < 0 or event_index > num_events: await ctx.send("ERROR: Event Index Out of Range.")
+    if event_index < 0 or event_index > num_events: await ctx.send("ERROR: Event Index Out of Range."); return
     
     # Get the list of all events that took place
     events = list(flight_hours_manager.event_history.keys())

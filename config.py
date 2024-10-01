@@ -123,7 +123,7 @@ class FlightHours:
         with open(file_path, "w") as file:
         
             # Iterate through the dictionary
-            for member_id, minutes in self._flight_hours.items():
+            for member_id, minutes in self.flight_hours.items():
             
                 # Check if the member exists
                 member = None
