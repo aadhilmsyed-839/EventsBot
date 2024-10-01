@@ -88,6 +88,8 @@ class FlightHours:
     
         # Convert non-parseable data types to parseable data types
         start_time_str = {k: v.isoformat() for k, v in self.start_time.items()}
+        member_history_list = {k: list(v) for k, v in self.member_history.items()}
+        event_history_list = {k: list(v) for k, v in self.event_history.items()}
         voice_channel_ids = [channel.id for channel in self.voice_channels]
         
         # Store the data in JSON format
@@ -113,8 +115,8 @@ class FlightHours:
                 self.voice_channels = [config.guild.get_channel(vc_id) for vc_id in data.get("voice_channels", [])]
                 self.flight_hours = data.get("flight_hours", {})
                 self.start_time = {k: time.fromisoformat(v) for k, v in data.get("start_time", {}).items()}
-                self.member_history = data.get("member_history", {})
-                self.event_history = data.get("event_history", {})
+                self.member_history = {k: set(v) for k, v in data.get("member_history", {}).items()}
+                self.event_history = {k: set(v) for k, v in data.get("event_history", {}).items()}
                 
                 
     async def export(self, file_path):
