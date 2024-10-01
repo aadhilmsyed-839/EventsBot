@@ -122,7 +122,7 @@ async def on_scheduled_event_update(before, after):
         for member_id in list(flight_hours_manager.start_time.keys()):
             
             # Log the left member and get the elapsed time
-            elapsed_minutes = flight_hours_manager.log_end_time(str(member.id))
+            elapsed_minutes = flight_hours_manager.log_end_time(str(member_id))
             
             # Update the logger information to the log channel
             await logger.info(f"<@{member_id}> left {before.channel.mention}. Ending Logging...")
