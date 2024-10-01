@@ -369,7 +369,7 @@ async def view_event_history(ctx, event_index = 0):
         await ctx.send(events_str); return
         
     # Get the Event Name as the Index for the Event History Dicitonary
-    event_name = events[event_index]
+    event_name = events[(event_index - 1)]
     
     # Send a message containing the people who attended the event
     attend_str = f"## Attendance for Event '{event_name}'"
