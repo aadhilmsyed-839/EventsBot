@@ -168,7 +168,7 @@ async def remove_event_vc(ctx, channel: discord.VoiceChannel = None):
         await ctx.send(f"You cannot remove {channel.mention} as an event VC. There is currently no active event."); return
         
     # Check if the voice channel is already in the list of logged channels
-    if channel not in flight_hours_manager.voice_channels: await ctx.send(f"{channel.menton} is not an event voice channel."); return
+    if channel not in flight_hours_manager.voice_channels: await ctx.send(f"{channel.mention} is not an event voice channel."); return
         
     # Add the voice channel to the list of logged voice channels
     flight_hours_manager.voice_channels.remove(channel)
