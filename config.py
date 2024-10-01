@@ -41,78 +41,101 @@ class Configurations:
 
 class FlightHours:
     def __init__(self):
-        self._flight_hours = {}
-        self._start_time = {}
-        self._is_event_active = False
-        self._voice_channels = []
-        self._joined_event = set()
-
-    @property
-    def flight_hours(self): return self._flight_hours
-
-    @property
-    def start_time(self): return self._start_time
-
-    @property
-    def is_event_active(self): return self._is_event_active
-
-    @property
-    def voice_channels(self): return self._voice_channels
     
-    @property
-    def num_joined(self): return self._num_joined
+        # Class Attributes
+        self.flight_hours = {}          # Key: Member ID (str) | Value: Minutes (int)
+        self.start_time = {}            # Key: Member ID (str) | Value: Time (datetime)
+        self.event_history = {}         # Key: Event Name (str) | Value: ID of Members Joined (Set of str)
+        self.member_history = {}        # Key: Member ID (str) | Value: Events Joined (Set of str)
+        self.active_event = None
+        self.voice_channels = []
 
-    @is_event_active.setter
-    def is_event_active(self, value): self._is_event_active = value
-
-    @voice_channels.setter
-    def voice_channels(self, channels): self._voice_channels = channels
-    
-    @num_joined.setter
-    def num_joined(self, value): self._num_joined = value
 
     def log_start_time(self, member_id):
-        if str(member_id) not in self._start_time:
-            self._start_time[str(member_id)] = time.now(pytz.utc)
-            self._num_joined += 1
+
+        # Add the member to the start time dictionary and the member history dictionary
+        if str(member_id) not in self.start_time: self.start_time[str(member_id)] = time.now(pytz.utc)
+        if str(member_id) not in self.member_history: self.member_history[str(member_id)] = set()
+        
+        # Add the member to the event history
+        try: self.event_history[self.active_event.name].add(str(member_id))
+        except Exception as e: logger.error(e)
+        
+        # Add the event to the member history
+        try: self.member_history[str(member_id)].add(self.active_event.name)
+        except Exceptions as e: logger.error(e)
+        
 
     def log_end_time(self, member_id):
-        if str(member_id) in self._start_time:
-            elapsed = time.now(pytz.utc) - self._start_time[str(member_id)]
-            if str(member_id) not in self._flight_hours:
-                self._flight_hours[str(member_id)] = 0
-            self._flight_hours[str(member_id)] += (elapsed.total_seconds() // 60)
-            del self._start_time[str(member_id)]
-            return elapsed.total_seconds() // 60
-        return 0
+    
+        if str(member_id) in self.start_time:
         
+            # Calculate how long the member was in the voice channel for
+            elapsed = time.now(pytz.utc) - self.start_time[str(member_id)]
+            minutes_flown = (elapsed.total_seconds() // 60)
+            
+            # If the member is not in the flight hours dictionary, add them to it
+            if str(member_id) not in self.flight_hours: self.flight_hours[str(member_id)] = 0
+            
+            # Add the elapsed minutes to the total flight hours for the member
+            self.flight_hours[str(member_id)] += minutes_flown
+            
+            # Remove the start time entry for the member
+            del self.start_time[str(member_id)]
+            
+            # Return the minutes flown
+            return minutes_flown
+            
+        else: return 0 # Extra layer of protection
+
     def save(self, file_path="data/flight_hours.json"):
-        start_time_str = {k: v.isoformat() for k, v in self._start_time.items()}
-        voice_channel_ids = [channel.id for channel in self._voice_channels]
+    
+        # Convert non-parseable data types to parseable data types
+        start_time_str = {k: v.isoformat() for k, v in self.start_time.items()}
+        voice_channel_ids = [channel.id for channel in self.voice_channels]
+        
+        # Store the data in JSON format
         data = {
-            "is_event_active": self._is_event_active,
+            "active_event": self.active_event,
             "voice_channels": voice_channel_ids,
-            "flight_hours": self._flight_hours,
-            "start_time": start_time_str
+            "flight_hours": self.flight_hours,
+            "start_time": start_time_str,
+            "member_history": self.member_history,
+            "event_history": self.event_history
         }
+        
+        # Write the JSON data to the file
         with open(file_path, "w") as file: json.dump(data, file)
         
     def load(self, file_path="data/flight_hours.json"):
         if os.path.exists(file_path):
             with open(file_path, "r") as file:
+            
+                # Retrieve the JSON data from the file
                 data = json.load(file)
-                self._is_event_active = data.get("is_event_active", False)
-                self._voice_channels = data.get("voice_channels", [])
-                self._flight_hours = data.get("flight_hours", {})
-                self._start_time = {k: time.fromisoformat(v) for k, v in data.get("start_time", {}).items()}
+                self.active_event = data.get("active_event", None)
+                self.voice_channels = [config.guild.get_channel(vc_id) for vc_id in data.get("voice_channels", [])]
+                self.flight_hours = data.get("flight_hours", {})
+                self.start_time = {k: time.fromisoformat(v) for k, v in data.get("start_time", {}).items()}
+                self.member_history = data.get("member_history", {})
+                self.event_history = data.get("event_history", {})
+                
                 
     async def export(self, file_path):
         with open(file_path, "w") as file:
+        
+            # Iterate through the dictionary
             for member_id, minutes in self._flight_hours.items():
+            
+                # Check if the member exists
                 member = None
                 try: member = await config.guild.fetch_member(member_id)
                 except Exception as e: member = None
+                
+                # Calculate the flight time
                 hours, minutes = divmod(minutes, 60)
+                
+                # Write the flight time to the file
                 if member: file.write(f"{member.name}: {hours} hours {minutes} minutes\n")
 
 
