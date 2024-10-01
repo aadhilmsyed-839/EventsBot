@@ -32,7 +32,7 @@ async def on_voice_state_update(member, before, after):
     """
     
     # Check if there is an ongoing event
-    if not flight_hours_manager.is_event_active: return
+    if not flight_hours_manager.active_event: return
     
     # Check if there was a change in the voice channel
     if before.channel == after.channel: return
@@ -104,7 +104,7 @@ async def on_scheduled_event_update(before, after):
         # Set the active event and add the event VC to the voice channel list
         flight_hours_manager.active_event = after.name
         flight_hours_manager.event_history[after.name] = set()
-        if after.channel: flight_hours.voice_channels.append(after.channel)
+        if after.channel: flight_hours_manager.voice_channels.append(after.channel)
         
         # Log any members who are already in the voice channel
         if after.channel:

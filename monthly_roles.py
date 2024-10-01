@@ -98,6 +98,9 @@ async def update_roles(ctx):
         
     except Exception as e: logger.error(e)
     
+    flight_hours_manager.save();
+
+    
     # Update logger Information
     await ctx.send("Flight Hours Cleared."); await logger.info("Flight Hours Cleared.")
         
@@ -130,6 +133,9 @@ async def clear_flight_logs(ctx):
         flight_hours_manager.member_history.clear()
         
     except Exception as e: logger.error(e)
+    
+    # Export the updated data back to the file
+    flight_hours_manager.save();
     
     # Update logger Information
     await ctx.send("Flight Hours Cleared."); await logger.info("Flight Hours Cleared.")
