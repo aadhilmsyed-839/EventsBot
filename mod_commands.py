@@ -211,7 +211,7 @@ async def view_event_vc(ctx):
     
     # Send the list of voice channels being tracked
     channels_str = f"## Event Voice Channels"
-    channels_str += ''.join(f"\n- {channel.mention}" for channel in flight_hours.voice_channels)
+    channels_str += ''.join(f"\n- {channel.mention}" for channel in flight_hours_manager.voice_channels)
     await ctx.send(channels_str)
     
     
