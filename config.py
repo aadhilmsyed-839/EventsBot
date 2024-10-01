@@ -57,13 +57,9 @@ class FlightHours:
         if str(member_id) not in self.start_time: self.start_time[str(member_id)] = time.now(pytz.utc)
         if str(member_id) not in self.member_history: self.member_history[str(member_id)] = set()
         
-        # Add the member to the event history
-        try: self.event_history[self.active_event.name].add(str(member_id))
-        except Exception as e: logger.error(e)
-        
-        # Add the event to the member history
-        try: self.member_history[str(member_id)].add(self.active_event.name)
-        except Exceptions as e: logger.error(e)
+        # Add the member to the event history and the member to the event history
+        self.event_history[self.active_event].add(str(member_id))
+        self.member_history[str(member_id)].add(self.active_event)
         
 
     def log_end_time(self, member_id):
