@@ -14,52 +14,7 @@ import datetime
 import json
 import csv
 
-# Function to assign roles based on flight hours
-async def assign_roles(ctx, member: discord.Member):
-    """
-    Description:
-        This function acts as a helper function for the role updates. Given a member, it identifies the
-        number of flight hours this member has flown and assigns their roles accordingly.
-        
-    Arguments:
-        ctx : The command context object
-        member (discord.Member) : The member that is pending role updates
-        
-    Returns:
-        None
-    """
-    try:
-        
-        # Skip over bots
-        if member.bot: return
-    
-        # Remove roles from previous role update
-        for role_id in list(config.roles.keys()):
-            role = config.guild.get_role(role_id)
-            await member.remove_roles(role)
-        
-        # Return if the member has not logged any flight hours
-        if str(member.id) not in list(flight_hours_manager.flight_hours.keys()): return
-        
-        # Get the number of Minutes from the Flight Time
-        hours = (flight_hours_manager.flight_hours[str(member.id)] // 60) + 1
-#        await logger.info(f"Member {member.mention} has logged {hours} hours of flight time.")
-        
-        # Assign them Roles Based on their Threshold
-        for role_id, threshold in config.roles.items():
-            # If the Hours Meets the Threshold, Assign the Role
-            if hours >= threshold:
-                role = config.guild.get_role(role_id)
-                await member.add_roles(role)
-#                await ctx.send(f"{member} was assigned {role} during role updates.")
-                await logger.info(f"- {member.mention} was assigned {role} during role updates.")
-                break  # Prevents Multiple Role Assignments
-                
-    except Exception as e: await logger.error(f"An error occurred in assign_roles: {e}")
-
-# Command to update roles based on flight hours
 @bot.command()
-@commands.has_permissions(manage_roles=True)
 async def update_roles(ctx):
     """
     Description:
@@ -72,59 +27,110 @@ async def update_roles(ctx):
     Returns:
         None
     """
-    # Update Logger Information
-    await logger.info(f"Server Role Updates requested by {ctx.message.author}.")
-    await logger.info("Starting Role Updates...")
-    await ctx.send(f"Starting Role Updates... This may take a while. Please check {config.log_channel.mention} for regular updates.")
     
-    try:
-        # For all members in the server, assign their new role
+    # Check if the message author is an executive
+    executive_role = config.guild.get_role(948366800712773635)
+    if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Otherwise start the role updates
+    await ctx.send(f"Starting Role Updates... This may take a while. Please check {config.log_channel.mention} for regular updates.")
+    await logger.info(f"Role Updates Requested by {ctx.message.author.mention}.")
+    
+    # Get the list of members and the number of members
+    members, member_count = ctx.guild.members, ctx.guild.member_count
+    
+    # Iterate through every member and update roles as necessary
+    for i, member in enumerate(members):
         
-        members = ctx.guild.members
-        member_count = 
-        for i, member in enumerate(cmembers):
-            await logger.info(f"({i + 1}/{ctx.guild.member_count}) Updating Roles for {member.mention}")
-            await assign_roles(ctx, member)
+        # Send logger message, and verify that members is a human member
+        logger.info(f"({(i + 1)}/{member_count}) Updating Roles for {member.mention}")
+        if member.bot: continue
         
+        # Remove any pre-existing class roles
+        for role_id in list(config.roles.keys()):
+            await member.remove_roles(config.guild.get_role(role_id))
+            
+            
+        # Check if the member has logged any flight time in the previous month
+        minutes = 0
+        if str(member.id) in list(flight_hours_manager.flight_hours.keys()): minutes = flight_hours_manager.flight_hours[str(member.id)]
+        if minutes == 0: continue
         
-        # Update Information to Logger
-        await logger.info("Role Updates Complete.")
-        await ctx.send("Role Updates Complete.")
+        # Get the number of hours logged
+        hours = (minutes_logged / 60) + 1
         
-        # Send the Flight Hours as a Text File to the Log Channel
-        await logger.info("Processing Flight Hours Text File...")
+        # Assign roles based on thresholds
+        for role_id, threshold in config.roles.items():
+        
+            # If the threshold is not met, move onto the next available role
+            if hours < threshold: continue
+            
+            # Otherwise assign the earned role for that member
+            try: await member.add_roles(config.guild.get_role(role_id))
+            except Exception as e: logger.error(e)
+            
+            # Update the logger information and break from role assignments
+            await logger.info(f"- {member.mention} was assigned {role.name} during role updates")
+            break
+            
+        # Update logger and channel information
+        await ctx.send(f"Role Updates Complete.")
+        await logger.info("Role Updates Completing. Now Exporting Flight Hours...")
+        
+        # Send the exported file to the log channel
         file_path = "data/role_updates.txt"
         await flight_hours_manager.export(file_path)
-        with open(file_path, "rb") as file:
-            await config.log_channel.send("Exported flight hours:", file=discord.File(file, file_path))
+        with open(file_path, "rb") as file: await config.log_channel.send(file = discord.File(file, file_path))
         
-        # Clear the Flight Logs for the Next Month
-        flight_hours_manager.flight_hours.clear()
+        # Send the total number of events and members joined to the log channel
+        num_events, num_joined = len(flight_hours_manager.event_history), len(flight_hours_manager.flight_hours)
+        await logger.info("There were a total of {num_events} during the current month. A total of {num_joined} logged flight time during the current month.")
         
-    except Exception as e: await logger.error(f"An error occurred in update_roles: {e}")
+    # Update logger information
+    await ctx.send("Clearing Flight Hours"); await logger.info("Clearing Flight Hours")
     
+    # Clear the Flight Hours Dictionary
+    try:
+        flight_hours_manager.start_times.clear()
+        flight_hours_manager.flight_hours.clear()
+        flight_hours_manager.event_history.clear()
+        flight_hours_manager.member_history.clear()
+        
+    except Exception as e: logger.error(e)
+    
+    # Update logger Information
+    await ctx.send("Flight Hours Cleared."); await logger.info("Flight Hours Cleared.")
+        
 @bot.command()
-@commands.has_permissions(manage_roles=True)
 async def clear_flight_logs(ctx):
     """
     Description:
         When called by an administrator, this function will reset all of the flight logs by removing
         every entry in the flight_hours dictionary.
-        
+
     Arguments:
         ctx : The context of the command
-        
+
     Returns:
         None
     """
-    try:
-        # Clear the dictionary
-        await logger.info("Clearing Flight Hours...")
-        await ctx.send("Clearing Flight Hours...")
-        flight_hours_manager.flight_hours.clear()
-        flight_hours_manager.start_time.clear()
-        flight_hours_manager.save()
-        await ctx.send("Flight Hours Cleared.")
-        await logger.info(f"Flight Hours Cleared.")
     
-    except Exception as e: await logger.error(f"An error occurred in clear_flight_logs: {e}")
+    # Check if the message author is an executive
+    executive_role = config.guild.get_role(948366800712773635)
+    if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Update logger information
+    await ctx.send("Clearing Flight Hours"); await logger.info("Clearing Flight Hours")
+    
+    # Clear the Flight Hours Dictionary
+    try:
+        flight_hours_manager.start_times.clear()
+        flight_hours_manager.flight_hours.clear()
+        flight_hours_manager.event_history.clear()
+        flight_hours_manager.member_history.clear()
+        
+    except Exception as e: logger.error(e)
+    
+    # Update logger Information
+    await ctx.send("Flight Hours Cleared."); await logger.info("Flight Hours Cleared.")
+            
