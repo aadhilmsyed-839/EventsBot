@@ -73,7 +73,7 @@ async def on_voice_state_update(member, before, after):
         # Update the logger information to the log channel
         await logger.info(f"{member.mention} left {before.channel.mention}. Ending Logging...")
         await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to {member.mention}. " \
-                          "{member.mention} has a total flight time of {int(flight_hours_manager.flight_hours[str(member.id)])} minutes.")
+                          f"{member.mention} has a total flight time of {int(flight_hours_manager.flight_hours[str(member.id)])} minutes.")
                           
         # Export the updated data back to the file
         flight_hours_manager.save(); return
@@ -127,7 +127,7 @@ async def on_scheduled_event_update(before, after):
             # Update the logger information to the log channel
             await logger.info(f"<@{member_id}> left {before.channel.mention}. Ending Logging...")
             await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to <@{member_id}>. " \
-                              "<@{member_id}> has a total flight time of {int(flight_hours_manager.flight_hours[str(member_id)])} minutes.")
+                              f"<@{member_id}> has a total flight time of {int(flight_hours_manager.flight_hours[str(member_id)])} minutes.")
             
         # Update logger information to the log channel
         await logger.info(f"Ending Logging for Event '{before.name}'. A total of {len(flight_hours_manager.event_history[before.name])} members joined.")
