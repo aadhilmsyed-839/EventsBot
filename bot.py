@@ -40,11 +40,7 @@ async def on_ready():
     await logger.info(f'Logged in as {bot.user.name} ({bot.user.id})')
     
     # If there is an ongoing event retrieve the event VC
-    channel_ids = flight_hours_manager._voice_channels.copy()
-    flight_hours_manager._voice_channels = [config.guild.get_channel(vc_id) for vc_id in channel_ids]
-    if flight_hours_manager._is_event_active:
-        await logger.info(f'Resuming Event Logging...')
-        return
+    if flight_hours_manager.active_event: await logger.info(f'Resuming Event Logging...'); return
         
     # If an event has already started, then start logging for that event
     for event in config.guild.scheduled_events:
@@ -54,17 +50,18 @@ async def on_ready():
             await logger.info(f"Starting Flight Logging for Event '{event.name}'.")
             
             # Update the Event Voice Channel & Event Status Flag
-            flight_hours_manager.voice_channels.append(event.channel)
-            flight_hours_manager.is_event_active = True
+            flight_hours_manager.active_event = event.name
+            flight_hours_manager.event_history[event.name] = set()
+            if event.channel: flight_hours_manager.voice_channels.append(event.channel)
             
             # If Members Are Already in the Voice Channel, Log Them
-            for member in flight_hours_manager.voice_channels[0].members:
-                flight_hours_manager.log_start_time(member.id)
-                await logger.info(f"{member.mention} Joined the Event. Starting Logging...")
+            if event.channel:
+                for member in event.channel.members:
+                    flight_hours_manager.log_start_time(member.id)
+                    await logger.info(f"{member.mention} Joined {event.channel.mention}. Starting Logging...")
                 
             break
             
 @bot.event
-async def on_command_error(ctx, error):
-    await logger.error(error)
+async def on_command_error(ctx, error): await logger.error(error)
 

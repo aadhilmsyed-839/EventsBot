@@ -13,14 +13,14 @@ from config import config
 from logger import logger
 
 # Import Commands
-from commands.help import help
-from commands.metar import metar
-from commands.mod_commands import *
-from commands.member_commands import *
+from help import help
+from metar import metar
+from mod_commands import *
+from member_commands import *
 
 # Import Flight Logging
-from events.flight_logs import *
-from events.monthly_roles import *
+from flight_logs import *
+from monthly_roles import update_roles, clear_flight_logs
 
 # Start the Bot
 bot.run(TOKEN)
