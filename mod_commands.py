@@ -322,6 +322,7 @@ async def view_member_history(ctx, member: discord.Member):
     
     # Check if the member has attended at least one event
     if not flight_hours_manager.member_history: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
+    if str(member.id) not in flight_hours_manager.member_history: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
     if not flight_hours_manager.member_history[str(member.id)]: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
     
     # Otherwise print all the channels
