@@ -29,15 +29,15 @@ async def on_ready():
         None
     """
     
-    # Load in Configuration Data from File
-    config.load()
-    flight_hours_manager.load()
-    
     # Update Logger with Login Information
     config.guild = bot.get_guild(553718744233541656)
     config.log_channel = config.guild.get_channel(1184292134258479176)
     await logger.setChannel(config.log_channel)
     await logger.info(f'Logged in as {bot.user.name} ({bot.user.id})')
+    
+    # Load in Configuration Data from File
+    config.load()
+    flight_hours_manager.load()
     
     # If there is an ongoing event retrieve the event VC
     if flight_hours_manager.active_event: await logger.info(f'Resuming Event Logging...'); return
