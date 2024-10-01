@@ -129,7 +129,7 @@ async def add_event_vc(ctx, channel: discord.VoiceChannel = None):
         return
         
     # Check if the voice channel is already in the list of logged channels
-    if channel in flight_hours_manager.voice_channels: await ctx.send(f"{channel.menton} is already an event voice channel."); return
+    if channel in flight_hours_manager.voice_channels: await ctx.send(f"{channel.mention} is already an event voice channel."); return
         
     # Add the voice channel to the list of logged voice channels
     flight_hours_manager.voice_channels.append(channel)
