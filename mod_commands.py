@@ -350,7 +350,7 @@ async def view_event_history(ctx, event_index = 0):
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if there have been any events in the current month
-    if flight_hours_manager.event_history: await ctx.send("There have not been any events in the current month."); return
+    if not flight_hours_manager.event_history: await ctx.send("There have not been any events in the current month."); return
     
     # Check if the event index is valid
     num_events = len(flight_hours_manager.event_history)
