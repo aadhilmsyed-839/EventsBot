@@ -98,8 +98,8 @@ class FlightHours:
             "voice_channels": voice_channel_ids,
             "flight_hours": self.flight_hours,
             "start_time": start_time_str,
-            "member_history": self.member_history,
-            "event_history": self.event_history
+            "member_history": member_history_list,
+            "event_history": event_history_list
         }
         
         # Write the JSON data to the file
