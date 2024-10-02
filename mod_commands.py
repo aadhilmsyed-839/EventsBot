@@ -553,10 +553,10 @@ async def remove_blacklist_member(ctx, member: discord.Member):
     config.save()
 
 @bot.command()
-async def view_blacklist_member(ctx):
+async def view_blacklist_members(ctx):
     """
-    Command to view the list of restricted announcement channels.
-
+    A list of all the members on the blacklist
+    
     Parameters:
         ctx (discord.ext.commands.Context): The context object representing the command's context.
 
