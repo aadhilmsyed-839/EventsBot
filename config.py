@@ -21,10 +21,12 @@ class Configurations:
             1110680332879011882: 2,
             1112981412191146004: 1
         }
+        self.blacklist = []
         
     def save(self, file_path="data/config.json"):
         data = {
             "restricted_channels": self.restricted_channels,
+            "blacklist_members": self.blacklist
 #            "roles": self.roles,
 #            "metar_embed_thumbnail_url": self.metar_embed_thumbnail_url
         }
@@ -35,6 +37,7 @@ class Configurations:
             with open(file_path, "r") as file:
                 data = json.load(file)
                 self.restricted_channels = data.get("restricted_channels", [])
+                self.blacklist = data.get("blacklist_members", [])
 #                self.roles = data.get("roles", {})
 #                self.metar_embed_thumbnail_url = data.get("metar_embed_thumbnail_url", None)
 

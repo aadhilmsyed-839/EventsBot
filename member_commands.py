@@ -55,10 +55,10 @@ def expected_role(minutes):
         str: The expected role based on flight time
     """
 
-    if   minutes > (8 * 60): return "First Class"
-    elif minutes > (5 * 60): return "Business Class"
-    elif minutes > (2 * 60): return "Premium Economy"
-    elif minutes > (1 * 60): return "Economy Class"
+    if   minutes > (config.roles[989232534313369630] * 60): return "First Class"
+    elif minutes > (config.roles[1110680241569017966] * 60): return "Business Class"
+    elif minutes > (config.roles[1110680332879011882] * 60): return "Premium Economy"
+    elif minutes > (config.roles[1112981412191146004] * 60): return "Economy Class"
     else:                    return "Member"
 
 
@@ -233,28 +233,60 @@ async def quack(ctx):
     """
     try: await ctx.send(':duck:')
     except Exception as e: await logger.error(f"An error occurred in quack command: {e}")
+    
+@bot.command()
+async def copilotsays(ctx, *, message: str):
+    """
+    Command to repeat the input message and delete the command message.
+    
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        message (str): The message to repeat.
+    
+    Returns:
+        None
+    """
+    
+    # Check if the message author is on the blacklist
+    if ctx.message.author.id in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
+    
+    # Check if the message contains a ping
+    moderator_role = config.guild.get_role(766386531681435678)
+    if moderator_role not in ctx.message.author.roles:
+        if message.mentions or message.role_mentions or message.mentions_everyone:
+            ctx.send("You cannot ping a role or member with the bot."); return
 
-#@bot.command()
-#async def spam(ctx, *, message: str):
-#    """
-#    Command to spam a given message
-#
-#    Parameters:
-#        ctx (discord.ext.commands.Context): The context object representing the command's context.
-#        message (str): The message to spam.
-#
-#    Returns:
-#        None
-#    """
-#    try:
-#
-#        for word in message.split(" "):
-#            if word[0] == "@": await ctx.send("You cannot ping using the bot."); return;
-#
-#        # Send the input message to the channel
-#        for _ in range(5): await ctx.send(message)
-#
-#        # Delete the command message
-#        await ctx.message.delete()
-#
-#    except Exception as e: await logger.error(f"An error occurred: {e}")
+    # Delete the command message
+    await ctx.message.delete()
+
+    # Send the input message to the channel
+    await ctx.send(message)
+    
+
+@bot.command()
+async def spam(ctx, *, message: str):
+    """
+    Command to resend the input message 5 times and delete the command message.
+    
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        message (str): The message to repeat.
+    
+    Returns:
+        None
+    """
+    
+    # Check if the message author is on the blacklist
+    if ctx.message.author.id in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
+    
+    # Check if the message contains a ping
+    moderator_role = config.guild.get_role(766386531681435678)
+    if moderator_role not in ctx.message.author.roles:
+        if message.mentions or message.role_mentions or message.mentions_everyone:
+            ctx.send("You cannot ping a role or member with the bot."); return
+
+    # Delete the command message
+    await ctx.message.delete()
+
+    # Send the input message to the channel
+    for _ in range(5): await ctx.send(message)
