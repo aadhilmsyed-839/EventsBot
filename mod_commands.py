@@ -398,17 +398,55 @@ async def add_event_attendance(ctx, member: discord.Member, *, event_name: str):
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if the event exists
-    if event_name not in flight_hours_manager.event_history.keys(): await ctx.send(f"'{event_name}' could not be found in the database"); return
+    if event_name not in flight_hours_manager.event_history.keys(): await ctx.send(f"Event '{event_name}' could not be found in the database"); return
     
     # Add the Member to the Event Attendance
-    flight_hours_manager[event_name].add(str(member.id))
+    flight_hours_manager.event_history[event_name].add(str(member.id))
     
     # Check if the member has a member history entry
     if str(member.id) not in flight_hours_manager.member_history.keys(): flight_hours_manager.member_history[str(member.id)] = set([])
     
     # Add the Event to the Member History
-    flight_hours_manager[str(member.id)].add(event_name)
+    flight_hours_manager.member_history[str(member.id)].add(event_name)
     
+    # Update Logger Information
+    await ctx.send(f"{member.mention} was successfully added to the attendance for event '{event_name}'")
+    await logger.info(f"{member.mention was added to the attendance for event '{event_name}' by {ctx.message.author}")
+
+
+@bot.command()
+async def remove_event_attendance(ctx, member: discord.Member, *, event_name: str):
+    """
+    Removes event attendance for the specified member and event.
+
+    Parameters:
+        ctx: The command context object
+        member: The Discord member (mention)
+        event_name: The event name (enclosed in quotes if it contains spaces)
+
+    Returns:
+        None
+    """
+    
+    # Check if the message author is an executive
+    executive_role = config.guild.get_role(948366800712773635)
+    if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if the event exists
+    if event_name not in flight_hours_manager.event_history.keys(): await ctx.send(f"Event '{event_name}' could not be found in the database"); return
+    
+    # Remove the Member from the Event Attendance
+    flight_hours_manager.event_history[event_name].remove(str(member.id))
+    
+    # Check if the member has a member history entry
+    if str(member.id) not in flight_hours_manager.member_history.keys(): return
+    
+    # Remove the event name from the list of events attended for the member
+    if event_name in flight_hours_manager.member_history[str(member.id)]: flight_hours_manager.member_history[str(member.id)].remove(event_name)
+    
+    # Update Logger Information
+    await ctx.send(f"{member.mention} was successfully removed from the attendance for event '{event_name}'")
+    await logger.info(f"{member.mention was removed from the attendance for event '{event_name}' by {ctx.message.author}")
     
 
 @bot.command()
