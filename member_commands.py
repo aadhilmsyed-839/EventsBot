@@ -253,7 +253,7 @@ async def copilotsays(ctx, *, message: str):
     # Check if the message contains a ping
     moderator_role = config.guild.get_role(766386531681435678)
     if moderator_role not in ctx.message.author.roles:
-        if cctx.message.mentions or ctx.message.role_mentions or "@everyone" in message or "@here" in message:
+        if ctx.message.mentions or ctx.message.role_mentions or "@everyone" in message or "@here" in message:
             await ctx.send("You cannot ping a role or member with the bot."); return
 
     # Delete the command message
