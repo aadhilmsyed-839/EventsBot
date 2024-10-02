@@ -327,6 +327,7 @@ async def view_member_history(ctx, member: discord.Member):
     
     # Otherwise print all the channels
     events_str = f"## Events Attended for {member.mention}"
+    events_str += f"-# This member has attended a total of {len(flight_hours_manager.member_history[str(member.id)])} events."
     events_str += ''.join(f"\n- {event_name}" for event_name in flight_hours_manager.member_history[str(member.id)])
     await ctx.send(events_str)
     
@@ -373,10 +374,42 @@ async def view_event_history(ctx, event_index = 0):
     
     # Send a message containing the people who attended the event
     attend_str = f"## Attendance for Event '{event_name}'"
-    attend_str += ''.join(f"\n- <@{member_id}>" for member_id in flight_hours_manager.event_history[event_name])
+    attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participants."
+    attend_str += ''.join(f"\n- {ctx.guild.fetch_member(member_id).name}" for member_id in flight_hours_manager.event_history[event_name])
     await ctx.send(attend_str)
 
 
+@bot.command()
+async def add_event_attendance(ctx, member: discord.Member, *, event_name: str):
+    """
+    Adds event attendance for the specified member and event.
+
+    Parameters:
+        ctx: The command context object
+        member: The Discord member (mention)
+        event_name: The event name (enclosed in quotes if it contains spaces)
+
+    Returns:
+        None
+    """
+    
+    # Check if the message author is an executive
+    executive_role = config.guild.get_role(948366800712773635)
+    if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if the event exists
+    if event_name not in flight_hours_manager.event_history.keys(): await ctx.send(f"'{event_name}' could not be found in the database"); return
+    
+    # Add the Member to the Event Attendance
+    flight_hours_manager[event_name].add(str(member.id))
+    
+    # Check if the member has a member history entry
+    if str(member.id) not in flight_hours_manager.member_history.keys(): flight_hours_manager.member_history[str(member.id)] = set([])
+    
+    # Add the Event to the Member History
+    flight_hours_manager[str(member.id)].add(event_name)
+    
+    
 
 @bot.command()
 @commands.has_permissions(manage_channels=True)
