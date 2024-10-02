@@ -248,7 +248,7 @@ async def copilotsays(ctx, *, message: str):
     """
     
     # Check if the message author is on the blacklist
-    if ctx.message.author.id in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
+    if str(ctx.message.author.id) in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
     
     # Check if the message contains a ping
     moderator_role = config.guild.get_role(766386531681435678)
@@ -277,7 +277,7 @@ async def spam(ctx, *, message: str):
     """
     
     # Check if the message author is on the blacklist
-    if ctx.message.author.id in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
+    if str(ctx.message.author.id) in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
     
     # Check if the message contains a ping
     moderator_role = config.guild.get_role(766386531681435678)
