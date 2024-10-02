@@ -378,7 +378,7 @@ async def view_event_history(ctx, event_index = 0):
 
     # Send a message containing the people who attended the event
     attend_str = f"## Attendance for Event '{event_name}'\n"
-    attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participants."
+    attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participants.\n"
     attend_str += "\n".join(member_names)
     await ctx.send(attend_str)
 
