@@ -417,6 +417,9 @@ async def add_event_attendance(ctx, member: discord.Member, *, event_name: str):
     # Update Logger Information
     await ctx.send(f"{member.mention} was successfully added to the attendance for event '{event_name}'")
     await logger.info(f"{member.mention} was added to the attendance for event '{event_name}' by {ctx.message.author.mention}")
+    
+    # Save the updated flight hours to the file
+    flight_hours_manager.save()
 
 
 @bot.command()
@@ -453,7 +456,122 @@ async def remove_event_attendance(ctx, member: discord.Member, *, event_name: st
     await ctx.send(f"{member.mention} was successfully removed from the attendance for event '{event_name}'")
     await logger.info(f"{member.mention} was removed from the attendance for event '{event_name}' by {ctx.message.author.mention}")
     
+    # Save the updated flight hours to the file
+    flight_hours_manager.save()
+  
+  
+@bot.command()
+async def view_event_attendance(ctx, event_name: str):
+    """
+    Displays the event attendance for a given event name
 
+    Parameters:
+        ctx: The command context object
+        event_name: The event name (enclosed in quotes if it contains spaces)
 
+    Returns:
+        None
+    """
     
+    # Check if the message author is an executive
+    executive_role = config.guild.get_role(948366800712773635)
+    if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if the event exists
+    if event_name not in flight_hours_manager.event_history.keys(): await ctx.send(f"Event '{event_name}' could not be found in the database"); return
+    
+    # Create a list of member names
+    member_names = []
+    for member_id in flight_hours_manager.event_history[event_name]: member = await ctx.guild.fetch_member(member_id); member_names.append(f"- {member.name}")
 
+    # Send a message containing the people who attended the event
+    attend_str = f"## Attendance for Event '{event_name}'\n"
+    attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participant(s).\n"
+    attend_str += "\n".join(member_names)
+    await ctx.send(attend_str)
+
+
+@bot.command()
+async def add_blacklist_member(ctx, member: discord.Member):
+    """
+    Adds a member to the member blacklist, preventing access to commands like !copilotsays and !spam
+
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        member (discord.Member) : The member to add to the blacklist
+
+    Returns:
+        None
+    """
+    
+    # Verify that the member is a moderator
+    moderator_role = config.guild.get_role(766386531681435678)
+    if moderator_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if the member is already in the blacklist
+    if str(member.id) in config.blacklist: await ctx.send(f"{member.mention} is already on the blacklist."); return
+    
+    # Otherwise add the member to the blacklist
+    config.blacklist.append(str(member.id))
+    
+    # Update logger information
+    await ctx.send(f"{member.mention} was added to the blacklist.")
+    await logger.info(f"{member.mention} was added to the blacklist by {ctx.message.author.mention}")
+    
+    # Resave the configurations to the config file
+    config.save()
+        
+        
+@bot.command()
+async def remove_blacklist_member(ctx, member: discord.Member):
+    """
+    Removes a member from the member blacklist, re-enabling access to commands like !copilotsays and !spam
+
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        member (discord.Member) : The member to add to the blacklist
+
+    Returns:
+        None
+    """
+    
+    # Verify that the member is a moderator
+    moderator_role = config.guild.get_role(766386531681435678)
+    if moderator_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if the member is already in the blacklist
+    if str(member.id) not in config.blacklist: await ctx.send(f"{member.mention} is not on the blacklist."); return
+    
+    # Otherwise add the member to the blacklist
+    config.blacklist.remove(str(member.id))
+    
+    # Update logger information
+    await ctx.send(f"{member.mention} was removed from the blacklist.")
+    await logger.info(f"{member.mention} was removed from the blacklist by {ctx.message.author.mention}")
+    
+    # Resave the configurations to the config file
+    config.save()
+
+@bot.command()
+async def view_blacklist_member(ctx):
+    """
+    Command to view the list of restricted announcement channels.
+
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+
+    Returns:
+        None
+    """
+    
+    # Verify that the member is a moderator
+    moderator_role = config.guild.get_role(766386531681435678)
+    if moderator_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # If there are no restricted channels, send a message
+    if not config.blacklist: await ctx.send("There are currently no members on the blaclist")
+    
+    # Otherwise print all the channels
+    channels_str = f"## Blacklisted Members in {ctx.guild.name}"
+    channels_str += ''.join(f"\n- <@{member_id}>" for member_id in config.blacklist)
+    await ctx.send(channels_str)
