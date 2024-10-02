@@ -254,7 +254,7 @@ async def copilotsays(ctx, *, message: str):
     moderator_role = config.guild.get_role(766386531681435678)
     if moderator_role not in ctx.message.author.roles:
         if ctx.message.mentions or ctx.message.role_mentions or ctx.message.mention_everyone:
-            ctx.send("You cannot ping a role or member with the bot."); return
+            await ctx.send("You cannot ping a role or member with the bot."); return
 
     # Delete the command message
     await ctx.message.delete()
@@ -283,7 +283,7 @@ async def spam(ctx, *, message: str):
     moderator_role = config.guild.get_role(766386531681435678)
     if moderator_role not in ctx.message.author.roles:
         if ctx.message.mentions or ctx.message.role_mentions or ctx.message.mention_everyone:
-            ctx.send("You cannot ping a role or member with the bot."); return
+            await ctx.send("You cannot ping a role or member with the bot."); return
 
     # Delete the command message
     await ctx.message.delete()
