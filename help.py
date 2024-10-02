@@ -23,7 +23,7 @@ async def help(ctx):
     embed = discord.Embed(
         title = f"GeoFS Events CoPilot",
         color = discord.Color.blue(),
-        description = "Your Gateway to an Enhanced Flight Simulation Experience. Version: v1.12"
+        description = "Your Gateway to an Enhanced Flight Simulation Experience. Version: v2.0"
     )
     
     # Add the Member Commands
@@ -50,6 +50,16 @@ async def help(ctx):
     embed.add_field(
         name = "!leaderboard",
         value = "Checkout who has the most flight hours logged for the current month. Example Usage: !leaderboard",
+        inline = False
+    )
+    embed.add_field(
+        name = "!copilotsays.",
+        value = "This command will make the bot repeat whatever message that is sent in the command message. (i.e.: `!copilotsays hi` will make the bot say `hi`. This command is unavailable to blacklisted members.",
+        inline = False
+    )
+    embed.add_field(
+        name = "!spam",
+        value = "This command will make the bot spam whatever message that is sent in the command message. (i.e.: `!spam hi` will make the bot send the message `hi` 5 times. This command is unavailable to blacklisted members.",
         inline = False
     )
     embed.add_field(
