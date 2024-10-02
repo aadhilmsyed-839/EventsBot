@@ -23,7 +23,7 @@ from member_commands import dotspam, ping, quack, copilotsays, dotspam
 from mod_commands import add_restricted_channel, remove_restricted_channel, view_restricted_channels
 from mod_commands import add_event_vc, remove_event_vc, view_event_vc
 from mod_commands import add_flight_time, remove_flight_time, view_flight_time
-from mod_commands import add_blacklist_member, remove_blacklist_member, view_blacklist_member
+from mod_commands import add_blacklist_member, remove_blacklist_member, view_blacklist_members
 from mod_commands import view_event_history, view_member_history
 from mod_commands import add_event_attendance, remove_event_attendance, view_event_attendance
 
