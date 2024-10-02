@@ -87,22 +87,23 @@ async def update_roles(ctx):
         await logger.info("There were a total of {num_events} during the current month. A total of {num_joined} logged flight time during the current month.")
         
     # Update logger information
-    await ctx.send("Clearing Flight Hours"); await logger.info("Clearing Flight Hours")
+    await ctx.send("Clearing Flight Hours");
     
     # Clear the Flight Hours Dictionary
     try:
-        flight_hours_manager.start_times.clear()
+        flight_hours_manager.start_time.clear()
         flight_hours_manager.flight_hours.clear()
         flight_hours_manager.event_history.clear()
         flight_hours_manager.member_history.clear()
         
     except Exception as e: await logger.error(e)
     
+    # Export the updated data back to the file
     flight_hours_manager.save();
-
     
     # Update logger Information
-    await ctx.send("Flight Hours Cleared."); await logger.info("Flight Hours Cleared.")
+    await ctx.send("Flight Hours Cleared."); await logger.info(f"Flight Hours Were Cleared by {ctx.message.author.mention}")
+            
         
 @bot.command()
 async def clear_flight_logs(ctx):
@@ -127,7 +128,7 @@ async def clear_flight_logs(ctx):
     
     # Clear the Flight Hours Dictionary
     try:
-        flight_hours_manager.start_times.clear()
+        flight_hours_manager.start_time.clear()
         flight_hours_manager.flight_hours.clear()
         flight_hours_manager.event_history.clear()
         flight_hours_manager.member_history.clear()
