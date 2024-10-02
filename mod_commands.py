@@ -416,7 +416,7 @@ async def add_event_attendance(ctx, member: discord.Member, *, event_name: str):
     
     # Update Logger Information
     await ctx.send(f"{member.mention} was successfully added to the attendance for event '{event_name}'")
-    await logger.info(f"{member.mention} was added to the attendance for event '{event_name}' by {ctx.message.author}")
+    await logger.info(f"{member.mention} was added to the attendance for event '{event_name}' by {ctx.message.author.mention}")
 
 
 @bot.command()
@@ -451,7 +451,7 @@ async def remove_event_attendance(ctx, member: discord.Member, *, event_name: st
     
     # Update Logger Information
     await ctx.send(f"{member.mention} was successfully removed from the attendance for event '{event_name}'")
-    await logger.info(f"{member.mention} was removed from the attendance for event '{event_name}' by {ctx.message.author}")
+    await logger.info(f"{member.mention} was removed from the attendance for event '{event_name}' by {ctx.message.author.mention}")
     
 
 @bot.command()
