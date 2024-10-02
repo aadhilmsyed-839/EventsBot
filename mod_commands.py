@@ -372,11 +372,16 @@ async def view_event_history(ctx, event_index = 0):
     # Get the Event Name as the Index for the Event History Dicitonary
     event_name = events[(event_index - 1)]
     
+    # Create a list of member names
+    member_names = []
+    for member_id in flight_hours_manager.event_history[event_name]: member = await ctx.guild.fetch_member(member_id); member_names.append(f"- {member.name}")
+
     # Send a message containing the people who attended the event
     attend_str = f"## Attendance for Event '{event_name}'\n"
     attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participants."
-    attend_str += ''.join(f"\n- {await ctx.guild.fetch_member(member_id).name}" for member_id in flight_hours_manager.event_history[event_name])
+    attend_str += "\n".join(member_names)
     await ctx.send(attend_str)
+
 
 
 @bot.command()
