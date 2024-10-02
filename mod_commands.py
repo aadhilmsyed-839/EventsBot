@@ -569,7 +569,7 @@ async def view_blacklist_members(ctx):
     if moderator_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # If there are no restricted channels, send a message
-    if not config.blacklist: await ctx.send("There are currently no members on the blaclist")
+    if not config.blacklist: await ctx.send("There are currently no members on the blacklist"); return
     
     # Otherwise print all the channels
     channels_str = f"## Blacklisted Members in {ctx.guild.name}"
