@@ -327,7 +327,7 @@ async def view_member_history(ctx, member: discord.Member):
     
     # Otherwise print all the channels
     events_str = f"## Events Attended for {member.mention}\n"
-    events_str += f"-# This member has attended a total of {len(flight_hours_manager.member_history[str(member.id)])} events."
+    events_str += f"-# This member has attended a total of {len(flight_hours_manager.member_history[str(member.id)])} event(s)."
     events_str += ''.join(f"\n- {event_name}" for event_name in flight_hours_manager.member_history[str(member.id)])
     await ctx.send(events_str)
     
@@ -378,7 +378,7 @@ async def view_event_history(ctx, event_index = 0):
 
     # Send a message containing the people who attended the event
     attend_str = f"## Attendance for Event '{event_name}'\n"
-    attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participants.\n"
+    attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participant(s).\n"
     attend_str += "\n".join(member_names)
     await ctx.send(attend_str)
 
