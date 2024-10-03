@@ -296,3 +296,80 @@ async def spam(ctx, *, message: str):
 
     # Send the input message to the channel
     for _ in range(5): await ctx.send(message)
+
+
+@bot.command()
+async def view_member_history(ctx, member: discord.Member = None):
+    """
+    Description:
+        Shows all of the events that a member has attended
+        
+    Arguments:
+        ctx : The command object
+        member : The member to remove flight time from
+        
+    Return:
+        None
+    """
+    
+    # Check if the specified member is None
+    if member is None: member = ctx.message.author
+    
+    # Check if the member has attended at least one event
+    if not flight_hours_manager.member_history: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
+    if str(member.id) not in flight_hours_manager.member_history: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
+    if not flight_hours_manager.member_history[str(member.id)]: await ctx.send(f"{member.mention} has not attended any events for the current month."); return
+    
+    # Otherwise print all the channels
+    events_str = f"## Events Attended for {member.mention}\n"
+    events_str += f"-# This member has attended a total of {len(flight_hours_manager.member_history[str(member.id)])} event(s)."
+    events_str += ''.join(f"\n- {event_name}" for event_name in flight_hours_manager.member_history[str(member.id)])
+    await ctx.send(events_str)
+    
+    
+@bot.command()
+async def view_event_history(ctx, event_index = 0):
+    """
+    Description:
+        Shows all of the events that a member has attended
+        
+    Arguments:
+        ctx : The command object
+        member : The member to remove flight time from
+        
+    Return:
+        None
+    """
+    
+    
+    # Check if there have been any events in the current month
+    if not flight_hours_manager.event_history: await ctx.send("There have not been any events in the current month."); return
+    
+    # Check if the event index is valid
+    num_events = len(flight_hours_manager.event_history)
+    if event_index < 0 or event_index > num_events: await ctx.send("ERROR: Event Index Out of Range."); return
+    
+    # Get the list of all events that took place
+    events = list(flight_hours_manager.event_history.keys())
+    
+    # If the event index is 0, simply print out all of the events that happened during the current month
+    if not event_index:
+        
+        # Send a message containing all of the events for the current month
+        events_str = f"## List of Events in {ctx.guild.name} for the Current Month \n"
+        events_str += "-# Check the attendance by passing the index of the event. (Example: !view_event_history 3)"
+        for i, event_name in enumerate(events): events_str += f"\n{(i + 1)}. {event_name}"
+        await ctx.send(events_str); return
+        
+    # Get the Event Name as the Index for the Event History Dicitonary
+    event_name = events[(event_index - 1)]
+    
+    # Create a list of member names
+    member_names = []
+    for member_id in flight_hours_manager.event_history[event_name]: member = await ctx.guild.fetch_member(member_id); member_names.append(f"- {member.name}")
+
+    # Send a message containing the people who attended the event
+    attend_str = f"## Attendance for Event '{event_name}'\n"
+    attend_str += f"-# This event had a total of {len(flight_hours_manager.event_history[event_name])} participant(s).\n"
+    attend_str += "\n".join(member_names)
+    await ctx.send(attend_str)
