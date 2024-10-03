@@ -257,7 +257,7 @@ async def copilotsays(ctx, *, message: str):
     
     # Check if the message contains a ping
     if moderator_role not in ctx.message.author.roles and (ctx.message.mentions or ctx.message.role_mentions or "@everyone" in message or "@here" in message):
-            await ctx.send("You cannot ping a role or member with the bot."); return
+        await ctx.send("You cannot ping a role or member with the bot."); return
             
     # Delete the command message
     await ctx.message.delete()
@@ -289,7 +289,7 @@ async def spam(ctx, *, message: str):
     
     # Check if the message contains a ping
     if moderator_role not in ctx.message.author.roles and (ctx.message.mentions or ctx.message.role_mentions or "@everyone" in message or "@here" in message):
-            await ctx.send("You cannot ping a role or member with the bot."); return
+        await ctx.send("You cannot ping a role or member with the bot."); return
 
     # Delete the command message
     await ctx.message.delete()
