@@ -56,7 +56,7 @@ async def on_voice_state_update(member, before, after):
         flight_hours_manager.log_start_time(str(member.id))
         
         # Update Information to the Logger
-        await logger.info(f"{member.mention} Joined {after.channel.mention}. Starting Logging...")
+        await logger.info(f"{member.mention} joined {after.channel.mention}. Starting Logging...")
         
         # Export the updated data back to the file
         flight_hours_manager.save(); return
@@ -109,7 +109,8 @@ async def on_scheduled_event_update(before, after):
         # Log any members who are already in the voice channel
         if after.channel:
             for member in after.channel.members:
-                if member.bot: continue; flight_hours_manager.log_start_time(member.id)
+                if member.bot: continue
+                flight_hours_manager.log_start_time(member.id)
                 await logger.info(f"{member.mention} joined {after.channel.mention}. Starting Logging...")
 
         # Export the updated data back to the file
