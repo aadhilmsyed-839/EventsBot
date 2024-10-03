@@ -23,7 +23,7 @@ async def help(ctx):
     embed = discord.Embed(
         title = f"GeoFS Events CoPilot",
         color = discord.Color.blue(),
-        description = "Your Gateway to an Enhanced Flight Simulation Experience. Version: v2.0"
+        description = "Your Gateway to an Enhanced Flight Simulation Experience. Version: v2.1"
     )
     
     # Add the Member Commands
@@ -60,6 +60,16 @@ async def help(ctx):
     embed.add_field(
         name = "!spam",
         value = "This command will make the bot spam whatever message that is sent in the command message. (i.e.: `!spam hi` will make the bot send the message `hi` 5 times. This command is unavailable to blacklisted members.",
+        inline = False
+    )
+    embed.add_field(
+        name = "!view_member_history",
+        value = "This command has an optional member argument. If a member argument is not specified, the member will be the message author. This command will show the list of events that the specified member has attended for the current month.",
+        inline = False
+    )
+    embed.add_field(
+        name = "!view_event_history",
+        value = "This command has an optional index argument. When no index argument is passed, the command will list all of the events that have taken place in the server for the current month in the format of an ordered list, which can be used to identify the index for a given event. If an index argument is passed, the command will retrieve the attendance list for the event with the given index.",
         inline = False
     )
     embed.add_field(
