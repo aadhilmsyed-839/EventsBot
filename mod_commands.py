@@ -461,7 +461,7 @@ async def remove_event_attendance(ctx, member: discord.Member, *, event_name: st
   
   
 @bot.command()
-async def view_event_attendance(ctx, event_name: str):
+async def view_event_attendance(ctx, *, event_name: str):
     """
     Displays the event attendance for a given event name
 
