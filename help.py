@@ -54,12 +54,12 @@ async def help(ctx):
     )
     embed.add_field(
         name = "!copilotsays.",
-        value = "This command will make the bot repeat whatever message that is sent in the command message. (i.e.: `!copilotsays hi` will make the bot say `hi`. This command is unavailable to blacklisted members.",
+        value = "This command will make the bot repeat whatever message that is sent in the command message. (i.e.: `!copilotsays hi` will make the bot say `hi`. This command is only available to members with a role of Business Class or higher, and it will be completely unavailable to blacklisted members.",
         inline = False
     )
     embed.add_field(
         name = "!spam",
-        value = "This command will make the bot spam whatever message that is sent in the command message. (i.e.: `!spam hi` will make the bot send the message `hi` 5 times. This command is unavailable to blacklisted members.",
+        value = "This command will make the bot spam whatever message that is sent in the command message. (i.e.: `!spam hi` will make the bot send the message `hi` 5 times. This command is only available to members with a role of Business Class or higher, and it will be completely unavailable to blacklisted members.",
         inline = False
     )
     embed.add_field(
