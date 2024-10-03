@@ -16,6 +16,7 @@ from logger import logger
 from help import help
 from metar import metar
 from member_commands import flighttime, leaderboard
+from member_commands import view_event_history, view_member_history
 from member_commands import on_message_delete, on_reaction_remove
 from member_commands import dotspam, ping, quack, copilotsays, spam
 
@@ -24,7 +25,6 @@ from mod_commands import add_restricted_channel, remove_restricted_channel, view
 from mod_commands import add_event_vc, remove_event_vc, view_event_vc
 from mod_commands import add_flight_time, remove_flight_time, view_flight_time
 from mod_commands import add_blacklist_member, remove_blacklist_member, view_blacklist_members
-from mod_commands import view_event_history, view_member_history
 from mod_commands import add_event_attendance, remove_event_attendance, view_event_attendance
 
 # Import Flight Logging
