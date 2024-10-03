@@ -17,7 +17,7 @@ from help import help
 from metar import metar
 from member_commands import flighttime, leaderboard
 from member_commands import on_message_delete, on_reaction_remove
-from member_commands import dotspam, ping, quack, copilotsays, dotspam
+from member_commands import dotspam, ping, quack, copilotsays, spam
 
 # Import Moderator Commands
 from mod_commands import add_restricted_channel, remove_restricted_channel, view_restricted_channels
