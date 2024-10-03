@@ -250,6 +250,11 @@ async def copilotsays(ctx, *, message: str):
     # Check if the message author is on the blacklist
     if str(ctx.message.author.id) in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
     
+    # Verify that the member is business class or above
+    business_class, first_class = config.guild.get_role(), config.guild.get_role()
+    if business_class not in ctx.message.author.roles and first_class not in ctx.message.author.roles:
+        await ctx.send("This command is acessible only to members with business class or above."); return
+    
     # Check if the message contains a ping
     moderator_role = config.guild.get_role(766386531681435678)
     if moderator_role not in ctx.message.author.roles:
@@ -278,6 +283,11 @@ async def spam(ctx, *, message: str):
     
     # Check if the message author is on the blacklist
     if str(ctx.message.author.id) in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
+    
+    # Verify that the member is business class or above
+    business_class, first_class = config.guild.get_role(), config.guild.get_role()
+    if business_class not in ctx.message.author.roles and first_class not in ctx.message.author.roles:
+        await ctx.send("This command is acessible only to members with business class or above."); return
     
     # Check if the message contains a ping
     moderator_role = config.guild.get_role(766386531681435678)
