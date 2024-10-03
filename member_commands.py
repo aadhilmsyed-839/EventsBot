@@ -251,7 +251,7 @@ async def copilotsays(ctx, *, message: str):
     if str(ctx.message.author.id) in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
     
     # Verify that the member is business class or above
-    business_class, first_class = config.guild.get_role(), config.guild.get_role()
+    business_class, first_class = config.guild.get_role(1110680241569017966), config.guild.get_role(989232534313369630)
     if business_class not in ctx.message.author.roles and first_class not in ctx.message.author.roles:
         await ctx.send("This command is acessible only to members with business class or above."); return
     
@@ -285,7 +285,7 @@ async def spam(ctx, *, message: str):
     if str(ctx.message.author.id) in config.blacklist: await ctx.send("You have been blacklisted from using this command."); return
     
     # Verify that the member is business class or above
-    business_class, first_class = config.guild.get_role(), config.guild.get_role()
+    business_class, first_class = config.guild.get_role(1110680241569017966), config.guild.get_role(989232534313369630)
     if business_class not in ctx.message.author.roles and first_class not in ctx.message.author.roles:
         await ctx.send("This command is acessible only to members with business class or above."); return
     
