@@ -398,9 +398,9 @@ async def view_event_attendance(ctx, *, event_name: str):
     # Check if the event exists
     if event_name not in flight_hours_manager.event_history.keys(): await ctx.send(f"Event '{event_name}' could not be found in the database"); return
     
-    # Create a list of member names
+    # Create a list of member namess
     member_names = []
-    for member_id in flight_hours_manager.event_history[event_name]: member = await ctx.guild.fetch_member(member_id); member_names.append(f"- {member.name}")
+    for member_id in flight_hours_manager.event_history[event_name]: member = await bot.fetch_user(member_id); member_names.append(f"- {member.name}")
 
     # Send a message containing the people who attended the event
     attend_str = f"## Attendance for Event '{event_name}'\n"

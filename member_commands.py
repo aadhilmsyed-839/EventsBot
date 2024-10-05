@@ -147,7 +147,7 @@ async def leaderboard(ctx):
             flight_time_str = f"{int(hours)} hours {int(minutes)} minutes"
             
             # Add the Information to the Embed
-            member = await config.guild.fetch_member(member_id)
+            member = await bot.fetch_user(member_id)
             embed.add_field(name=f"#{i}: {member.name}", value=flight_time_str, inline=False)
         
         # Send the Embed
@@ -366,7 +366,7 @@ async def view_event_history(ctx, event_index = 0):
     
     # Create a list of member names
     member_names = []
-    for member_id in flight_hours_manager.event_history[event_name]: member = await ctx.guild.fetch_member(member_id); member_names.append(f"- {member.name}")
+    for member_id in flight_hours_manager.event_history[event_name]: member = await bot.fetch_user(member_id); member_names.append(f"- {member.name}")
 
     # Send a message containing the people who attended the event
     attend_str = f"## Attendance for Event '{event_name}'\n"
