@@ -493,3 +493,142 @@ async def view_blacklist_members(ctx):
     channels_str = f"## Blacklisted Members in {ctx.guild.name}"
     channels_str += ''.join(f"\n- <@{member_id}>" for member_id in config.blacklist)
     await ctx.send(channels_str)
+
+
+@bot.command()
+async def add_event(ctx, event_name: str):
+    """
+    Adds an event to the event history
+
+    Parameters:
+        ctx: The command context object
+        event_name: The event name (enclosed in quotes if it contains spaces)
+
+    Returns:
+        None
+    """
+    
+    # Check if the message author is an executive
+    executive_role = config.guild.get_role(948366800712773635)
+    if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if the event already exists in the event history
+    if event_name in flight_hours_manager.event_history.keys(): await ctx.send("This event already exists in the event history."); return
+    
+    # Add the event to the event history
+    flight_hours_manager.event_history[event_name] = set()
+    
+    # Export the updated data back to the file
+    flight_hours_manager.save(); return
+    
+    
+@bot.command()
+async def remove_event(ctx, event_name: str):
+    """
+    Removes an event from the event history
+
+    Parameters:
+        ctx: The command context object
+        event_name: The event name (enclosed in quotes if it contains spaces)
+
+    Returns:
+        None
+    """
+    
+    # Check if the message author is an executive
+    executive_role = config.guild.get_role(948366800712773635)
+    if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if the event already exists in the event history
+    if event_name not in flight_hours_manager.event_history.keys(): await ctx.send("This event is not in the event history."); return
+    
+    # Remove all the atendees of the event
+    for member_id in flight_hours_manager.event_history[event_name]: flight_hours_manager.member_history[member_id].remove(event_name)
+    
+    # Add the event to the event history
+    del flight_hours_manager.event_history[event_name]
+    
+    # Export the updated data back to the file
+    flight_hours_manager.save(); return
+    
+
+@bot.command()
+async def start_event(ctx, event_name: str):
+    """
+    Description:
+        Starts an unofficial event with the given name
+        
+    Arguments:
+        ctx : The command object
+        event_name: The name of the event to be started
+        
+    Returns:
+        None
+    """
+    
+    # Verify that the member is an Event Manager
+    manager_role = config.guild.get_role(948366879980937297)
+    if manager_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if there is a current active event
+    if flight_hours_manager.active_event: await ctx.send("There is already an ongoing event. You cannot start another event.")
+    
+    # Check that the event does not already exist in the database
+    if event_name in flight_hours_manager.event_history.keys(): await ctx.send("An event with this name already exists. Please select a different name."); return
+    
+    # Update Logger Information
+    await logger.info(f"Starting Logging for Event '{event_name}'.")
+    
+    # Set the active event and add the event VC to the voice channel list
+    flight_hours_manager.active_event = event_name
+    flight_hours_manager.event_history[event_name] = set()
+
+    # Export the updated data back to the file
+    flight_hours_manager.save()
+    
+    
+@bot.command()
+async def end_event(ctx):
+    """
+    Description:
+        Ends any event that is currently ongoing
+        
+    Arguments:
+        ctx : The command object
+        
+    Returns:
+        None
+    """
+    
+    # Verify that the member is an Event Manager
+    manager_role = config.guild.get_role(948366879980937297)
+    if manager_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
+    
+    # Check if there is a current active event
+    if not flight_hours_manager.active_event: await ctx.send("There is currently no active event.")
+    
+    # End the Logging for all members who joined the event
+    for member_id in list(flight_hours_manager.start_time.keys()):
+        
+        # Log the left member and get the elapsed time
+        elapsed_minutes = flight_hours_manager.log_end_time(str(member_id))
+        
+        # Update the logger information to the log channel
+        await logger.info(f"<@{member_id}> left {before.channel.mention}. Ending Logging...")
+        await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to <@{member_id}>. " \
+                          f"<@{member_id}> has a total flight time of {int(flight_hours_manager.flight_hours[str(member_id)])} minutes.")
+        
+    # Update logger information to the log channel
+    event_name = flight_hours_manager.active_event
+    await logger.info(f"Ending Logging for Event '{event_name}'. A total of {len(flight_hours_manager.event_history[event_name])} members joined.")
+    
+    # Reset the active event and clear out the event VCs
+    flight_hours_manager.active_event = None
+    flight_hours_manager.voice_channels.clear()
+    flight_hours_manager.start_time.clear()
+                          
+    # Export the updated data back to the file
+    flight_hours_manager.save()
+    
+    
+
