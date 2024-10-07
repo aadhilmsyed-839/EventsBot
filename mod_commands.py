@@ -579,6 +579,7 @@ async def start_event(ctx, event_name: str):
     if event_name in flight_hours_manager.event_history.keys(): await ctx.send("An event with this name already exists. Please select a different name."); return
     
     # Update Logger Information
+    await ctx.send(f"Logging for event '{event_name}' has started.")
     await logger.info(f"Starting Logging for Event '{event_name}'.")
     
     # Set the active event and add the event VC to the voice channel list
@@ -623,6 +624,7 @@ async def end_event(ctx):
     # Update logger information to the log channel
     event_name = flight_hours_manager.active_event
     await logger.info(f"Ending Logging for Event '{event_name}'. A total of {len(flight_hours_manager.event_history[event_name])} members joined.")
+    await ctx.send(f"Logging for event '{event_name}' has ended. A total of {len(flight_hours_manager.event_history[event_name])} members joined.")
     
     # Reset the active event and clear out the event VCs
     flight_hours_manager.active_event = None
