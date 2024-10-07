@@ -517,6 +517,7 @@ async def add_event(ctx, event_name: str):
     
     # Add the event to the event history
     flight_hours_manager.event_history[event_name] = set()
+    await ctx.send(f"Event '{event_name}' was successfully added to the event history database.")
     
     # Export the updated data back to the file
     flight_hours_manager.save(); return
@@ -547,6 +548,7 @@ async def remove_event(ctx, event_name: str):
     
     # Add the event to the event history
     del flight_hours_manager.event_history[event_name]
+    await ctx.send(f"Event '{event_name}' was successfully removed from the event history database.")
     
     # Export the updated data back to the file
     flight_hours_manager.save(); return
