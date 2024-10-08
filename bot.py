@@ -63,5 +63,5 @@ async def on_ready():
             break
             
 @bot.event
-async def on_command_error(ctx, error): await logger.error(f"{error}\n---\nMessage Link: {ctx.message.jump_url}")
+async def on_command_error(ctx, error): await logger.error(f"{error} {ctx.message.jump_url}")
 
