@@ -180,7 +180,7 @@ async def remove_event_vc(ctx, channel: discord.VoiceChannel = None):
         elapsed_minutes = flight_hours_manager.log_end_time(str(member.id))
         await logger.info(f"{member.mention} left {channel.mention}. Ending Logging...")
         await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to {member.mention}. " \
-                          "{member.mention} has a total flight time of {int(flight_hours_manager.flight_hours[str(member.id)])} minutes.")
+                          f"{member.mention} has a total flight time of {int(flight_hours_manager.flight_hours[str(member.id)])} minutes.")
 
     # Save the updated flight hours to the file
     flight_hours_manager.save()
