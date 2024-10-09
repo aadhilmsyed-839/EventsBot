@@ -496,7 +496,7 @@ async def view_blacklist_members(ctx):
 
 
 @bot.command()
-async def add_event(ctx, event_name: str):
+async def add_event(ctx, *, event_name: str):
     """
     Adds an event to the event history
 
@@ -524,7 +524,7 @@ async def add_event(ctx, event_name: str):
     
     
 @bot.command()
-async def remove_event(ctx, event_name: str):
+async def remove_event(ctx, *, event_name: str):
     """
     Removes an event from the event history
 
@@ -555,7 +555,7 @@ async def remove_event(ctx, event_name: str):
     
 
 @bot.command()
-async def start_event(ctx, event_name: str):
+async def start_event(ctx, *, event_name: str):
     """
     Description:
         Starts an unofficial event with the given name
