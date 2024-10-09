@@ -608,7 +608,7 @@ async def end_event(ctx):
     if manager_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if there is a current active event
-    if not flight_hours_manager.active_event: await ctx.send("There is currently no active event.")
+    if not flight_hours_manager.active_event: await ctx.send("There is currently no active event."); return
     
     # End the Logging for all members who joined the event
     for member_id in list(flight_hours_manager.start_time.keys()):
