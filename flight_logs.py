@@ -8,7 +8,7 @@ from bot import bot
 from logger import logger
 
 # Import Necessary Local Files
-from config import flight_hours_manager
+from config import config, flight_hours_manager
 
 # Import Other Necessary Libraries
 from datetime import datetime as time
