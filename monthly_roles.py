@@ -43,7 +43,7 @@ async def update_roles(ctx):
     for i, member in enumerate(members):
         
         # Send logger message, and verify that members is a human member
-        logger.info(f"({(i + 1)}/{member_count}) Updating Roles for {member.mention}")
+        await logger.info(f"({(i + 1)}/{member_count}) Updating Roles for {member.mention}")
         if member.bot: continue
         
         # Remove any pre-existing class roles
