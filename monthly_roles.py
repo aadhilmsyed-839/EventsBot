@@ -57,7 +57,7 @@ async def update_roles(ctx):
         if minutes == 0: continue
         
         # Get the number of hours logged
-        hours = (minutes_logged / 60) + 1
+        hours = (minutes / 60) + 1
         
         # Assign roles based on thresholds
         for role_id, threshold in config.roles.items():
