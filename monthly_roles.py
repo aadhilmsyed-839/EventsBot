@@ -85,7 +85,7 @@ async def update_roles(ctx):
     
     # Send the total number of events and members joined to the log channel
     num_events, num_joined = len(flight_hours_manager.event_history), len(flight_hours_manager.flight_hours)
-        await logger.info("There were a total of {num_events} during the current month. A total of {num_joined} logged flight time during the current month.")
+    await logger.info("There were a total of {num_events} during the current month. A total of {num_joined} logged flight time during the current month.")
         
     # Update logger information
     await ctx.send("Clearing Flight Hours");
