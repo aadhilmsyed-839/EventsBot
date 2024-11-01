@@ -70,7 +70,7 @@ async def update_roles(ctx):
             except Exception as e: await logger.error(e)
             
             # Update the logger information and break from role assignments
-            role = await config.guild.get_role(role_id)
+            role = config.guild.get_role(role_id)
             await logger.info(f"- {member.mention} was assigned {role.name} during role updates")
             break
             
