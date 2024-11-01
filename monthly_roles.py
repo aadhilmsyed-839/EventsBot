@@ -48,7 +48,7 @@ async def update_roles(ctx):
         
         # Remove any pre-existing class roles
         for role_id in list(config.roles.keys()):
-            await member.remove_roles(config.guild.fetch_role(role_id))
+            await member.remove_roles(config.guild.get_role(role_id))
             
             
         # Check if the member has logged any flight time in the previous month
@@ -70,7 +70,7 @@ async def update_roles(ctx):
             except Exception as e: await logger.error(e)
             
             # Update the logger information and break from role assignments
-            role = await config.guild.fetch_role(role_id)
+            role = await config.guild.get_role(role_id)
             await logger.info(f"- {member.mention} was assigned {role.name} during role updates")
             break
             
