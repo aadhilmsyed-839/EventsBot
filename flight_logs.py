@@ -44,7 +44,7 @@ async def on_voice_state_update(member, before, after):
     if before.channel in flight_hours_manager.voice_channels and after.channel in flight_hours_manager.voice_channels:
     
         # Simply log the change of channels to the log channel
-        await logger.info(f"{member.mention} switched from {before.channel.mention} to {after.channel.mention}. Resuming Logging...")
+        await logger.info(f"{member.mention} switched from <#{before.channel.id}> to <#{after.channel.id}>. Resuming Logging...")
         
     # Case 3: Member switches from a non-event VC to an event VC (Joining Event)
     if before.channel not in flight_hours_manager.voice_channels and after.channel in flight_hours_manager.voice_channels:
@@ -56,7 +56,7 @@ async def on_voice_state_update(member, before, after):
         flight_hours_manager.log_start_time(str(member.id))
         
         # Update Information to the Logger
-        await logger.info(f"{member.mention} joined {after.channel.mention}. Starting Logging...")
+        await logger.info(f"{member.mention} joined <#{after.channel.id}>. Starting Logging...")
         
         # Export the updated data back to the file
         flight_hours_manager.save(); return
@@ -71,7 +71,7 @@ async def on_voice_state_update(member, before, after):
         elapsed_minutes = flight_hours_manager.log_end_time(str(member.id))
         
         # Update the logger information to the log channel
-        await logger.info(f"{member.mention} left {before.channel.mention}. Ending Logging...")
+        await logger.info(f"{member.mention} left <#{before.channel}>. Ending Logging...")
         await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to {member.mention}. " \
                           f"{member.mention} has a total flight time of {int(flight_hours_manager.flight_hours[str(member.id)])} minutes.")
                           
@@ -126,7 +126,7 @@ async def on_scheduled_event_update(before, after):
             elapsed_minutes = flight_hours_manager.log_end_time(str(member_id))
             
             # Update the logger information to the log channel
-            member = await config.guild.fetch_member(member_id)
+            member = await bot.fetch_user(int(member_id))
             if not member.voice.channel: continue
             await logger.info(f"<@{member_id}> left {member.voice.channel.mention}. Ending Logging...")
             await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to <@{member_id}>. " \
