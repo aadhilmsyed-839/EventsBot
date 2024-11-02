@@ -126,7 +126,7 @@ async def on_scheduled_event_update(before, after):
             elapsed_minutes = flight_hours_manager.log_end_time(str(member_id))
             
             # Update the logger information to the log channel
-            member = await bot.fetch_user(int(member_id))
+            member = await config.guild.get_member(int(member_id))
             if not member.voice.channel: continue
             await logger.info(f"<@{member_id}> left {member.voice.channel.mention}. Ending Logging...")
             await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to <@{member_id}>. " \
