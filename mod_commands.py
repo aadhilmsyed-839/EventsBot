@@ -617,9 +617,9 @@ async def end_event(ctx):
         elapsed_minutes = flight_hours_manager.log_end_time(str(member_id))
         
         # Update the logger information to the log channel
-        member = config.guild.get_member(int(member_id))
-        vc_channel = member.voice.channel.mention if member.voice.channel else "the event"
-        await logger.info(f"{member.mention} left {vc_channel}. Ending Logging...")
+#        member = config.guild.get_member(int(member_id))
+#        vc_channel = member.voice.channel.mention if member.voice else "the event"
+        await logger.info(f"{member.mention} left the event. Ending Logging...")
         await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to <@{member_id}>. " \
                           f"{member.mention} has a total flight time of {int(flight_hours_manager.flight_hours[str(member_id)])} minutes.")
         
