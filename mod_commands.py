@@ -618,6 +618,8 @@ async def end_event(ctx):
         
         # Update the logger information to the log channel
         member = await bot.fetch_user(int(member_id))
+        if member is None: await ctx.send("Member is None")
+        if member.voice.channel is None: ctx.send("Voice is None")
         vc_channel = member.voice.channel.mention if member.voice.channel else "the event"
         await logger.info(f"{member.mention} left {vc_channel}. Ending Logging...")
         await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to <@{member_id}>. " \
