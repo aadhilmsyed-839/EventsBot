@@ -31,7 +31,6 @@ async def on_ready():
     
     # Update Logger with Login Information
     config.guild = bot.get_guild(553718744233541656)
-    events_guild.guild = config.guild
     config.log_channel = config.guild.get_channel(1184292134258479176)
     await logger.setChannel(config.log_channel)
     await logger.info(f'Logged in as {bot.user.name} ({bot.user.id})')
