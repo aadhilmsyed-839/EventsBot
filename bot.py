@@ -4,7 +4,7 @@ from discord.enums import EventStatus
 from discord.ext import commands
 
 from logger import logger
-from config import config, flight_hours_manager, events_guild
+from config import config, flight_hours_manager
 
 # Define Intents & Create Bot Object
 intents = discord.Intents.all()
