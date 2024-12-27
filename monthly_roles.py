@@ -29,7 +29,7 @@ async def update_roles(ctx):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Otherwise start the role updates
@@ -121,7 +121,7 @@ async def clear_flight_logs(ctx):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Update logger information

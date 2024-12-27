@@ -4,7 +4,7 @@ from discord.enums import EventStatus
 from discord.ext import commands
 
 from logger import logger
-from config import config, flight_hours_manager
+from config import config, flight_hours_manager, events_guild
 
 # Define Intents & Create Bot Object
 intents = discord.Intents.all()
@@ -31,6 +31,7 @@ async def on_ready():
     
     # Update Logger with Login Information
     config.guild = bot.get_guild(553718744233541656)
+    events_guild.guild = config.guild
     config.log_channel = config.guild.get_channel(1184292134258479176)
     await logger.setChannel(config.log_channel)
     await logger.info(f'Logged in as {bot.user.name} ({bot.user.id})')

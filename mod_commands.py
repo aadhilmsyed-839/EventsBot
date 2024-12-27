@@ -231,7 +231,7 @@ async def add_flight_time(ctx, member: discord.Member, minutes: int):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # If the member is not in the flight hours dictionary, create an entry
@@ -264,7 +264,7 @@ async def remove_flight_time(ctx, member: discord.Member, minutes: int):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # If the member is not in the flight hours dictionary, create an entry
@@ -317,7 +317,7 @@ async def add_event_attendance(ctx, member: discord.Member, *, event_name: str):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if the event exists
@@ -355,7 +355,7 @@ async def remove_event_attendance(ctx, member: discord.Member, *, event_name: st
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if the event exists
@@ -392,7 +392,7 @@ async def view_event_attendance(ctx, *, event_name: str):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if the event exists
@@ -509,7 +509,7 @@ async def add_event(ctx, *, event_name: str):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if the event already exists in the event history
@@ -537,7 +537,7 @@ async def remove_event(ctx, *, event_name: str):
     """
     
     # Check if the message author is an executive
-    executive_role = config.guild.get_role(948366800712773635)
+    executive_role = config.guild.get_role(1316559380782645278)
     if executive_role not in ctx.message.author.roles: await ctx.send("Your role is not high enough to use this command."); return
     
     # Check if the event already exists in the event history
@@ -619,9 +619,9 @@ async def end_event(ctx):
         # Update the logger information to the log channel
 #        member = config.guild.get_member(int(member_id))
 #        vc_channel = member.voice.channel.mention if member.voice else "the event"
-        await logger.info(f"{member.mention} left the event. Ending Logging...")
+        await logger.info(f"<#{member_id}> left the event. Ending Logging...")
         await logger.info(f"{int(elapsed_minutes)} minutes of flight time were added to <@{member_id}>. " \
-                          f"{member.mention} has a total flight time of {int(flight_hours_manager.flight_hours[str(member_id)])} minutes.")
+                          f"<#{member_id}> has a total flight time of {int(flight_hours_manager.flight_hours[str(member_id)])} minutes.")
         
     # Update logger information to the log channel
     event_name = flight_hours_manager.active_event

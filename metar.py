@@ -71,7 +71,7 @@ async def metar(ctx, icao_code: str):
         embed.add_field(name="Raw METAR", value=f"{metar_data['rawOb']}")
 
         # Add airport picture as the thumbnail
-        embed.set_thumbnail(url=config.metar_embed_thumbnail_url)
+        embed.set_thumbnail(url="https://media.istockphoto.com/id/537337166/photo/air-trafic-control-tower-and-airplance-at-paris-airport.jpg?b=1&s=612x612&w=0&k=20&c=kp14V8AXFNUh5jOy3xPQ_sxhOZLWXycdBL-eUGviMOQ=")
 
         # Set Embed Footer
         text = "Data Provided by Aviation Weather Center API."

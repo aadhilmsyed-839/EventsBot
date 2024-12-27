@@ -11,24 +11,61 @@ import os
 class Configurations:
     
     def __init__(self):
+
+        # Server and Log Channel    
         self.guild = None
         self.log_channel = None
+
+        # Server Staff Roles
+        self.captain_role = None
+        self.first_officer_role = None
+
+        # Server Member Roles
+        self.first_class_role = None
+        self.business_class_role = None
+        self.premium_economy_role = None
+        self.economy_class_role = None
+        self.member_role = None
+
+        # Long Haul Roles
+        self.flight_deck_role = None
+        self.lh_first_class_role = None
+        self.lh_business_class_role = None
+        self.lh_premium_economy_role = None
+        self.lh_economy_class_role = None
+        self.check_in_role = None
+        self.security_role = None
+
+        # Long Haul Channels
+        self.cockpit_channel = None
+        self.baggage_claim_channel = None
+        self.lh_first_class_channel = None
+        self.lh_business_class_channel = None
+        self.lh_premium_economy_channel = None
+        self.lh_economy_class_channel = None
+        self.check_in_channel = None
+        self.security_channel = None
+        self.boarding_lounge_channel = None
+        self.customs_channel = None
+
+
+
+        # Restricted Channels & Blacklist
         self.restricted_channels = []
-        self.metar_embed_thumbnail_url = "https://media.istockphoto.com/id/537337166/photo/air-trafic-control-tower-and-airplance-at-paris-airport.jpg?b=1&s=612x612&w=0&k=20&c=kp14V8AXFNUh5jOy3xPQ_sxhOZLWXycdBL-eUGviMOQ="
+        self.blacklist = []
+
+        # Roles
         self.roles = {  # Role ID, Hours
             989232534313369630: 8,
             1110680241569017966: 5,
             1110680332879011882: 2,
             1112981412191146004: 1
         }
-        self.blacklist = []
         
     def save(self, file_path="data/config.json"):
         data = {
             "restricted_channels": self.restricted_channels,
             "blacklist_members": self.blacklist
-#            "roles": self.roles,
-#            "metar_embed_thumbnail_url": self.metar_embed_thumbnail_url
         }
         with open(file_path, "w") as file: json.dump(data, file)
         
@@ -38,8 +75,6 @@ class Configurations:
                 data = json.load(file)
                 self.restricted_channels = data.get("restricted_channels", [])
                 self.blacklist = data.get("blacklist_members", [])
-#                self.roles = data.get("roles", {})
-#                self.metar_embed_thumbnail_url = data.get("metar_embed_thumbnail_url", None)
 
 
 class FlightHours:
@@ -138,7 +173,6 @@ class FlightHours:
                 
                 # Write the flight time to the file
                 if member: file.write(f"{member.name}: {hours} hours {minutes} minutes\n")
-
 
 # Create Objects
 config = Configurations()
