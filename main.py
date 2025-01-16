@@ -14,7 +14,7 @@ from logger import logger
 
 # Import Member Commands
 from help import help
-from metar import metar
+from metar import metar, atis
 from member_commands import flighttime, leaderboard
 from member_commands import view_event_history, view_member_history
 from member_commands import on_message_delete, on_reaction_remove

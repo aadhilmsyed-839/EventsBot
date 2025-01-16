@@ -114,3 +114,70 @@ async def get_metar_info(icao_code: str):
     except Exception as e:
         await logger.error(f"An error occurred in get_metar_info: {e}")
         return None
+
+@bot.command()
+async def atis(ctx, icao_code: str):
+    """
+    Command to fetch and display ATIS information for a specified airport ICAO code.
+
+    Parameters:
+        ctx (discord.ext.commands.Context): The context object representing the command's context.
+        icao_code (str): The ICAO code of the airport for which ATIS information is requested.
+
+    Returns:
+        None
+    """
+    try:
+        # Perform Input Validation on the ICAO Airport Code
+        if not icao_code.isalnum() or not (len(icao_code) == 4):
+            await ctx.send("Invalid ICAO code format. It must be 4 alphanumeric characters.")
+            return
+
+        # Get the ATIS data from the API
+        atis_data = await get_atis_info(icao_code)
+
+        # Send Error Message and Exit Function if No Information was Retrieved
+        if atis_data is None:
+            await ctx.send(f"Unable to retrieve ATIS info for {icao_code}")
+            return
+
+        # Send the ATIS information as a simple message
+        await ctx.send(atis_data['datis'])
+
+    except Exception as e:
+        await logger.error(f"An error occurred in atis command: {e}")
+
+async def get_atis_info(icao_code: str):
+    """
+    Description:
+        Fetches ATIS information for a specified airport ICAO code.
+
+    Parameters:
+        icao_code (str): The ICAO code of the airport for which ATIS information is requested.
+
+    Returns:
+        dict: A dictionary containing ATIS information, or None if the data couldn't be retrieved.
+
+    Raises:
+        requests.RequestException: If there is an issue with the HTTP request.
+    """
+    # API URL for ATIS info
+    api_url = f"https://datis.clowd.io/api/{icao_code}"
+    
+    try:
+        # Send a GET request to the API
+        response = requests.get(api_url)
+
+        # Return the response if the request was successful
+        if response.status_code == 200:
+            data = response.json()
+            return data[0] if data else None
+        
+        # If the request was unsuccessful, return nothing
+        else:
+            return None
+
+    # Log any Errors
+    except Exception as e:
+        await logger.error(f"An error occurred in get_atis_info: {e}")
+        return None
